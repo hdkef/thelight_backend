@@ -35,7 +35,7 @@ func main() {
 	router.HandleFunc("/article/publish", utils.Cors(article.PublishArticle()))
 	router.HandleFunc("/article/delete", utils.Cors(article.DeleteArticle()))
 
-	router.HandleFunc("/comment/get", utils.Cors(comment.GetComments()))
+	router.HandleFunc("/comment/getall", utils.Cors(comment.GetComments()))
 	router.HandleFunc("/comment/insert", utils.Cors(comment.InsertComment()))
 
 	router.HandleFunc("/media/uploadimage", utils.Cors(media.UploadImage()))

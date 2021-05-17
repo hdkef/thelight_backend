@@ -14,14 +14,15 @@ type Article struct {
 
 //ArticleFromClient is how article from client structured
 type ArticleFromClient struct {
-	ID         string
-	Page       string
-	Filter     string
-	Key        string
-	FromClient Article
+	ID                string
+	Page              string
+	Filter            string
+	Key               string
+	ArticleFromClient Article
 }
 
 //ArticleFromServer is how article from server structured
 type ArticleFromServer struct {
-	FromServer []Article
+	ArticlesFromServer []Article
+	ArticleFromServer  Article
 }

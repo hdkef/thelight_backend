@@ -9,10 +9,11 @@ type Comment struct {
 
 //CommentFromClient is how comment from client structured
 type CommentFromClient struct {
-	FromClient Comment
+	ID                string
+	CommentFromClient Comment
 }
 
 //CommentFromServer is how comment from server structured
 type CommentFromServer struct {
-	FromServer []Comment
+	CommentsFromServer []Comment
 }
