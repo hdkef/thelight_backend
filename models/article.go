@@ -1,5 +1,6 @@
 package models
 
+//Article is how article structured
 type Article struct {
 	ID         string
 	Date       string
@@ -9,4 +10,18 @@ type Article struct {
 	Tag        []string
 	ImageURL   string
 	WriterInfo WriterInfo
+}
+
+//ArticleFromClient is how article from client structured
+type ArticleFromClient struct {
+	ID         string
+	Page       string
+	Filter     string
+	Key        string
+	FromClient Article
+}
+
+//ArticleFromServer is how article from server structured
+type ArticleFromServer struct {
+	FromServer []Article
 }

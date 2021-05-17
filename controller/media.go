@@ -1,6 +1,9 @@
 package controller
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 //MediaHandler is a type that contain media handlefunc
 type MediaHandler struct {
@@ -14,13 +17,13 @@ func NewMediaHandler() *MediaHandler {
 //UploadImage will store image to folder and insert IMGDir to database
 func (x *MediaHandler) UploadImage() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		fmt.Println("UploadImage")
 	}
 }
 
 //GetImageDirs will give all image directories
 func (x *MediaHandler) GetImageDirs() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		fmt.Println("GetImageDirs")
 	}
 }

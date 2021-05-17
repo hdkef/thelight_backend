@@ -1,6 +1,9 @@
 package controller
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 //ArticleHandler is a type that contain article handlefunc
 type ArticleHandler struct {
@@ -14,48 +17,48 @@ func NewArticleHandler() *ArticleHandler {
 //GetArticles give all articles filtered and paginated by ID
 func (x *ArticleHandler) GetArticles() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		fmt.Println("GetArticles")
 	}
 }
 
 //GetArticle give one article. Probably because user view Article without going to landing-page first
 func (x *ArticleHandler) GetArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		fmt.Println("GetArticle")
 	}
 }
 
 //SearchArticles give all articles filtered by something and paginated by ID
 func (x *ArticleHandler) SearchArticles() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		fmt.Println("SearchArticles")
 	}
 }
 
 //SaveArticle will save the article as a draft
 func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		fmt.Println("SaveArticle")
 	}
 }
 
 //PublishArticle will publish article to public
 func (x *ArticleHandler) PublishArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		fmt.Println("PublishArticle")
 	}
 }
 
 //DeleteArticle will destroy article from existence
 func (x *ArticleHandler) DeleteArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		fmt.Println("DeleteArticle")
 	}
 }
 
 //EditArticle will edit/update existed article
 func (x *ArticleHandler) EditArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		fmt.Println("EditArticle")
 	}
 }
