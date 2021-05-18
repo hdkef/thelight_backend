@@ -56,7 +56,14 @@ func (x *AuthHandler) Login() http.HandlerFunc {
 			return
 		}
 
+		//TOBE REPLACED WITH REAL WRITERINFO FROM DB
 		response := models.AuthFromServer{
+			WriterInfo: models.WriterInfo{
+				ID:        user.ID,
+				Name:      user.Name,
+				AvatarURL: user.AvatarURL,
+				Bio:       user.Bio,
+			},
 			Token: token,
 		}
 
@@ -113,7 +120,8 @@ func sendNewToken(res *http.ResponseWriter, claims *models.WriterInfo) {
 	}
 
 	response := models.AuthFromServer{
-		NewToken: token,
+		WriterInfo: *claims,
+		NewToken:   token,
 	}
 
 	err = json.NewEncoder(*res).Encode(&response)

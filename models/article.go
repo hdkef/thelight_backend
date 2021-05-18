@@ -15,7 +15,7 @@ type Article struct {
 //ArticleFromClient is how article from client structured
 type ArticleFromClient struct {
 	ID                string
-	Page              string
+	Page              int64
 	Filter            string
 	Key               string
 	ArticleFromClient Article
