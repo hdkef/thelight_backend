@@ -38,8 +38,7 @@ func main() {
 	router.HandleFunc("/comment/getall", utils.Cors(comment.GetComments()))
 	router.HandleFunc("/comment/insert", utils.Cors(comment.InsertComment()))
 
-	router.HandleFunc("/media/uploadimage", utils.Cors(media.UploadImage()))
-	router.HandleFunc("/media/getimagedirs", utils.Cors(media.GetImageDirs()))
+	router.HandleFunc("/media/ws", utils.Cors(media.Media()))
 
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)

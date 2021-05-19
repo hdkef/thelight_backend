@@ -27,7 +27,6 @@ func (x *ArticleHandler) GetArticles() http.HandlerFunc {
 
 		err := json.NewDecoder(req.Body).Decode(&payload)
 		if err != nil {
-			fmt.Println(err)
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
 		}

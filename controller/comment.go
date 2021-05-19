@@ -53,5 +53,17 @@ func (x *CommentHandler) GetComments() http.HandlerFunc {
 func (x *CommentHandler) InsertComment() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		fmt.Println("InsertComment")
+
+		var payload models.CommentFromClient
+
+		err := json.NewDecoder(req.Body).Decode(&payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		//TOBE IMPLEMENTED STORE COMMENT TO DB
+
+		//////////////////////////////////////
 	}
 }
