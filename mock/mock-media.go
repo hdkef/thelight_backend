@@ -13,4 +13,5 @@ var Medias []models.Media = []models.Media{
 	oneMedia,
 	oneMedia,
 	oneMedia,
+	oneMedia,
 }

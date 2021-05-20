@@ -39,6 +39,7 @@ func main() {
 	router.HandleFunc("/comment/insert", utils.Cors(comment.InsertComment()))
 
 	router.HandleFunc("/media/ws", utils.Cors(media.Media()))
+	router.HandleFunc("/media/upload", utils.Cors(media.MediaUpload()))
 
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)

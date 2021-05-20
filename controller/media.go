@@ -49,7 +49,7 @@ var pagingFromClientChan chan models.MediaPayload = make(chan models.MediaPayloa
 //Media will handle websocket connection to media
 func (x *MediaHandler) Media() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("UploadImage")
+		fmt.Println("Media")
 
 		ws, err := upgrader.Upgrade(res, req, res.Header())
 		if err != nil {
