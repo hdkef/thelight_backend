@@ -14,3 +14,10 @@ type AuthFromServer struct {
 	Token      string
 	NewToken   string
 }
+
+type Settings struct {
+	ID        string
+	Name      string
+	Bio       string
+	AvatarURL string
+}

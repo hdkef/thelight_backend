@@ -27,6 +27,7 @@ func main() {
 
 	router.HandleFunc("/auth/login", utils.Cors(auth.Login()))
 	router.HandleFunc("/auth/autologin", utils.Cors(auth.AutoLogin()))
+	router.HandleFunc("/auth/settings", utils.Cors(auth.Settings()))
 
 	router.HandleFunc("/article/getall", utils.Cors(article.GetArticles()))
 	router.HandleFunc("/article/getone", utils.Cors(article.GetArticle()))
