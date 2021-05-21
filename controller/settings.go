@@ -21,7 +21,14 @@ func (x *AuthHandler) Settings() http.HandlerFunc {
 			return
 		}
 
-		payload.ID = req.FormValue("ID")
+		Token := getTokenHeader(req)
+		claims, err := checkTokenStringClaims(&Token)
+		if err != nil {
+			handleTokenErrClearBearer(&res, &err)
+			return
+		}
+
+		payload.ID = claims.ID
 		Name := req.FormValue("Name")
 		Bio := req.FormValue("Bio")
 

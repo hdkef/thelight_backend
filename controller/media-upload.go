@@ -23,7 +23,14 @@ func (x *MediaHandler) MediaUpload() http.HandlerFunc {
 			return
 		}
 
-		payload.ID = req.FormValue("ID")
+		Token := getTokenHeader(req)
+		claims, err := checkTokenStringClaims(&Token)
+		if err != nil {
+			handleTokenErrClearBearer(&res, &err)
+			return
+		}
+
+		payload.ID = claims.ID
 
 		imgurl, err := storeImage(req, "Image", "Image")
 		if err != nil {

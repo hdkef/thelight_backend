@@ -82,20 +82,14 @@ func (x *AuthHandler) AutoLogin() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		fmt.Println("AutoLogin")
 
-		var payload models.AuthFromClient
-		err := json.NewDecoder(req.Body).Decode(&payload)
-		if err != nil {
-			utils.ResErr(&res, http.StatusInternalServerError, err)
-			return
-		}
+		Token := getTokenHeader(*&req)
 
-		claims, err := checkTokenStringClaims(&payload.Token)
+		claims, err := checkTokenStringClaims(&Token)
 		if err != nil && err.Error() == "NEED NEW TOKEN" {
 			sendNewToken(&res, &claims)
 			return
 		} else if err != nil && err.Error() != "NEED NEW TOKEN" {
-
-			utils.ResErr(&res, http.StatusInternalServerError, err)
+			handleTokenErrClearBearer(&res, &err)
 			return
 		}
 
@@ -167,6 +161,19 @@ func createToken(user *models.WriterInfo) (string, error) {
 	} else {
 		return signedToken, nil
 	}
+}
+
+//getTokenHeader return token from Bearer header
+func getTokenHeader(req *http.Request) string {
+	return req.Header.Get("Bearer")
+}
+
+//handleTokenErrClearBearer set header ClearBearer when authentication fail and send response error
+func handleTokenErrClearBearer(res *http.ResponseWriter, err *error) {
+	fmt.Println("handleTokenErrClearBearer")
+	(*res).Header().Set("Clearbearer", "OK")
+	(*res).Header().Set("Access-Control-Expose-Headers", "Clearbearer")
+	utils.ResErr(res, http.StatusUnauthorized, *err)
 }
 
 //checkTokenStringClaims will validate token and return claims (NOT map claims) and error
