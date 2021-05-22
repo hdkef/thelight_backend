@@ -110,31 +110,3 @@ func (x *ArticleHandler) SearchArticles() http.HandlerFunc {
 		}
 	}
 }
-
-//SaveArticle will save the article as a draft
-func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
-	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("SaveArticle")
-	}
-}
-
-//PublishArticle will publish article to public
-func (x *ArticleHandler) PublishArticle() http.HandlerFunc {
-	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("PublishArticle")
-	}
-}
-
-//DeleteArticle will destroy article from existence
-func (x *ArticleHandler) DeleteArticle() http.HandlerFunc {
-	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("DeleteArticle")
-	}
-}
-
-//EditArticle will edit/update existed article
-func (x *ArticleHandler) EditArticle() http.HandlerFunc {
-	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("EditArticle")
-	}
-}

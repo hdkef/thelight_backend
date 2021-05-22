@@ -206,16 +206,6 @@ func checkTokenStringClaims(token *string) (models.WriterInfo, error) {
 	return claims, nil
 }
 
-//checkTokenStringErr will validate token and return bool // being used in checkOrigin websocket
-func checkTokenStringBool(token *string) bool {
-	fmt.Println("checkTokenStringBool")
-	err := checkTokenStringErr(token)
-	if err != nil {
-		return false
-	}
-	return true
-}
-
 //checkTokenStringErr will validate token and return error // being used in endpoints that doesn't need claims
 func checkTokenStringErr(token *string) error {
 	fmt.Println("checkTokenStringErr")

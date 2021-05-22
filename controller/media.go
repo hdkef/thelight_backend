@@ -24,8 +24,6 @@ func NewMediaHandler() *MediaHandler {
 //upgrader to upgrade http to websocket.Conn
 var upgrader websocket.Upgrader = websocket.Upgrader{
 	CheckOrigin: func(req *http.Request) bool {
-		// Bearer := req.Header.Get("Bearer")
-		// return checkTokenStringBool(&Bearer)
 		return true
 	},
 }
@@ -107,6 +105,11 @@ func receiveAndHandle(ctx context.Context) {
 func initFromClient(payload models.MediaPayload) {
 	fmt.Println("initFromClient")
 
+	valid := verifyTokenForWS(&payload.Token, payload.Conn)
+	if valid == false {
+		return
+	}
+
 	onlineMap[payload.ID] = payload.Conn
 
 	fmt.Println("onlineMap : ", onlineMap)
@@ -159,6 +162,11 @@ func pingPonger(ID string, ws *websocket.Conn) {
 func pagingFromClient(payload models.MediaPayload) {
 	fmt.Println("pagingFromClient")
 
+	valid := verifyTokenForWS(&payload.Token, payload.Conn)
+	if valid == false {
+		return
+	}
+
 	//TOBE IMPLEMENTED GET ALL IMAGE DIRS FROM DB AND VERIFY TOKEN
 	medias := mock.Medias
 	/////////////////////////////////////////////
@@ -169,4 +177,16 @@ func pagingFromClient(payload models.MediaPayload) {
 	}
 
 	payload.Conn.WriteJSON(&response)
+}
+
+//verifyTokenForWS handle token verification for ws conn which token sent via payload
+//will close conn if token invalid
+func verifyTokenForWS(token *string, ws *websocket.Conn) bool {
+	fmt.Println("verifyTokenForWS")
+	err := checkTokenStringErr(token)
+	if err != nil {
+		ws.Close()
+		return false
+	}
+	return true
 }
