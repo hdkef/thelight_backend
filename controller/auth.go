@@ -73,7 +73,7 @@ func (x *AuthHandler) Login() http.HandlerFunc {
 			return
 		}
 
-		founduser, err := driver.DBAuthReadUser(x.db, payload.Name)
+		user, err := driver.DBAuthReadUser(x.db, payload.Name)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
@@ -82,13 +82,6 @@ func (x *AuthHandler) Login() http.HandlerFunc {
 		//TOBE IMPLEMENTED COMPARE HASHED PASSWORD
 
 		////////////////////////////////////////
-
-		user := models.WriterInfo{
-			ID:        founduser.ID,
-			AvatarURL: founduser.AvatarURL,
-			Name:      founduser.Name,
-			Bio:       founduser.Bio,
-		}
 
 		token, err := createToken(&user)
 		if err != nil {

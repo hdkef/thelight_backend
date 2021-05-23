@@ -5,6 +5,7 @@ import "gorm.io/gorm"
 //Draft is how article draft is modeled for database
 type Draft struct {
 	gorm.Model
+	UserID   uint
 	Title    string
 	Body     string
 	Tag      string

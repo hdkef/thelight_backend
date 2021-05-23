@@ -15,7 +15,7 @@ func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
 		fmt.Println("SaveArticle")
 
 		Token := getTokenHeader(req)
-		err := checkTokenStringErr(&Token)
+		claims, err := checkTokenStringClaims(&Token)
 		if err != nil {
 			handleTokenErrClearBearer(&res, &err)
 			return
@@ -29,11 +29,17 @@ func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
 			return
 		}
 
-		//TOBE IMPLEMENTED STORE / UPDATE ARTICLE TO DRAFT ARTICLE
+		insertedID, err := driver.DBSaveArticle(x.db, &payload, claims.ID)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 
-		////////////////////////////////////////////////////
-
-		utils.ResOK(&res, "OK")
+		json.NewEncoder(res).Encode(struct {
+			ID uint
+		}{
+			insertedID,
+		})
 	}
 }
 
@@ -58,6 +64,10 @@ func (x *ArticleHandler) PublishArticle() http.HandlerFunc {
 		}
 
 		err = driver.DBPublishArticle(x.db, &payload, claims.ID)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 
 		utils.ResOK(&res, "OK")
 	}
@@ -83,9 +93,11 @@ func (x *ArticleHandler) DeleteArticle() http.HandlerFunc {
 			return
 		}
 
-		//TOBE IMPLEMENTED DELETE ARTICLE FROM RELEASED
-
-		///////////////////////////////////////////////
+		err = driver.DBDeleteArticle(x.db, payload.ID)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 
 		utils.ResOK(&res, "OK")
 	}

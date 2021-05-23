@@ -35,11 +35,11 @@ func (x *ArticleHandler) GetArticles() http.HandlerFunc {
 			return
 		}
 
-		//TO BE IMPLEMENTED GET ARTICLES AND PAGINATING FROM DB
-
 		articles, err := driver.DBReadAllArticles(x.db, int(payload.Page))
-
-		///////////////////////////////////////////////
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 
 		response := models.ArticleFromServer{
 			ArticlesFromServer: articles,
@@ -66,11 +66,11 @@ func (x *ArticleHandler) GetArticle() http.HandlerFunc {
 			return
 		}
 
-		//TO BE IMPLEMENTED GET ARTICLE BY ID
-
-		var article models.Article = mock.Onearticle
-
-		///////////////////////////////////////////////
+		article, err := driver.DBReadOneArticle(x.db, payload.ID)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 
 		response := models.ArticleFromServer{
 			ArticleFromServer: article,

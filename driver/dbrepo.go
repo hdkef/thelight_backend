@@ -22,9 +22,10 @@ func DBPublishArticle(db *gorm.DB, payload *models.ArticleFromClient, ID uint) e
 }
 
 //DBSaveArticle will save article to draft table and return autoincremented ID
-func DBSaveArticle(db *gorm.DB, payload *models.ArticleFromClient) (uint, error) {
+func DBSaveArticle(db *gorm.DB, payload *models.ArticleFromClient, ID uint) (uint, error) {
 
 	draft := Draft{
+		UserID:   ID,
 		Title:    payload.ArticleFromClient.Title,
 		Body:     payload.ArticleFromClient.Body,
 		Tag:      strings.Join(payload.ArticleFromClient.Tag, ","),
@@ -39,7 +40,7 @@ func DBSaveArticle(db *gorm.DB, payload *models.ArticleFromClient) (uint, error)
 
 //DBDeleteArticle will delete article
 func DBDeleteArticle(db *gorm.DB, ID uint) error {
-	if err := db.Delete(&Article{}, ID).Error; err != nil {
+	if err := db.Unscoped().Delete(&Article{}, ID).Error; err != nil {
 		return err
 	}
 	return nil
