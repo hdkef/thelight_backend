@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"thelight/driver"
 	"thelight/models"
 	"thelight/utils"
 )
@@ -42,7 +43,7 @@ func (x *ArticleHandler) PublishArticle() http.HandlerFunc {
 		fmt.Println("PublishArticle")
 
 		Token := getTokenHeader(req)
-		err := checkTokenStringErr(&Token)
+		claims, err := checkTokenStringClaims(&Token)
 		if err != nil {
 			handleTokenErrClearBearer(&res, &err)
 			return
@@ -56,9 +57,7 @@ func (x *ArticleHandler) PublishArticle() http.HandlerFunc {
 			return
 		}
 
-		//TOBE IMPLEMENTED STORE ARTICLE TO RELEASED ARTICLE
-
-		////////////////////////////////////////////////////
+		err = driver.DBPublishArticle(x.db, &payload, claims.ID)
 
 		utils.ResOK(&res, "OK")
 	}

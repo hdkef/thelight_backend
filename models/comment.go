@@ -2,14 +2,14 @@ package models
 
 //Comment is how comment structured
 type Comment struct {
-	ID   string
+	ID   uint
 	Name string
 	Text string
 }
 
 //CommentFromClient is how comment from client structured
 type CommentFromClient struct {
-	ID                string
+	ID                uint
 	CommentFromClient Comment
 }
 

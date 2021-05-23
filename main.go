@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"thelight/controller"
+	"thelight/driver"
 	"thelight/utils"
 
 	"github.com/gorilla/mux"
@@ -18,16 +19,21 @@ func init() {
 
 func main() {
 
-	var auth = controller.NewAuthHandler()
-	var article = controller.NewArticleHandler()
-	var comment = controller.NewCommentHandler()
-	var media = controller.NewMediaHandler()
+	db := driver.InitiateDB()
+	pg, _ := db.DB()
+	defer pg.Close()
+
+	var auth = controller.NewAuthHandler(db)
+	var article = controller.NewArticleHandler(db)
+	var comment = controller.NewCommentHandler(db)
+	var media = controller.NewMediaHandler(db)
 
 	router := mux.NewRouter()
 
 	router.HandleFunc("/auth/login", utils.Cors(auth.Login()))
 	router.HandleFunc("/auth/autologin", utils.Cors(auth.AutoLogin()))
 	router.HandleFunc("/auth/settings", utils.Cors(auth.Settings()))
+	router.HandleFunc("/auth/reg", utils.Cors(auth.Register()))
 
 	router.HandleFunc("/article/getall", utils.Cors(article.GetArticles()))
 	router.HandleFunc("/article/getone", utils.Cors(article.GetArticle()))

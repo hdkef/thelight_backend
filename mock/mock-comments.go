@@ -3,7 +3,7 @@ package mock
 import "thelight/models"
 
 var onecomment models.Comment = models.Comment{
-	ID:   "1b",
+	ID:   1,
 	Name: "Anonymous",
 	Text: "Thanks for sharing!",
 }

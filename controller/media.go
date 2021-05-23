@@ -10,15 +10,17 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"gorm.io/gorm"
 )
 
 //MediaHandler is a type that contain media handlefunc
 type MediaHandler struct {
+	db *gorm.DB
 }
 
 //NewMediaHandler return new pointer of comment handler
-func NewMediaHandler() *MediaHandler {
-	return &MediaHandler{}
+func NewMediaHandler(db *gorm.DB) *MediaHandler {
+	return &MediaHandler{db}
 }
 
 //upgrader to upgrade http to websocket.Conn
@@ -37,7 +39,7 @@ const (
 
 //onlineMap to store websocket.Conn with ID key
 
-var onlineMap map[string]*websocket.Conn = make(map[string]*websocket.Conn)
+var onlineMap map[uint]*websocket.Conn = make(map[uint]*websocket.Conn)
 
 //various channel to handle various payload type
 
@@ -129,7 +131,7 @@ func initFromClient(payload models.MediaPayload) {
 }
 
 //pingPonger will ping websocket conn and delete onlineMap if return error for defined time range
-func pingPonger(ID string, ws *websocket.Conn) {
+func pingPonger(ID uint, ws *websocket.Conn) {
 	fmt.Println("pingPonger")
 
 	ws.SetPongHandler(func(appData string) error {

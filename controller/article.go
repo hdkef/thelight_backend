@@ -4,18 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"thelight/driver"
 	"thelight/mock"
 	"thelight/models"
 	"thelight/utils"
+
+	"gorm.io/gorm"
 )
 
 //ArticleHandler is a type that contain article handlefunc
 type ArticleHandler struct {
+	db *gorm.DB
 }
 
 //NewArticleHandler return new pointer of article handler
-func NewArticleHandler() *ArticleHandler {
-	return &ArticleHandler{}
+func NewArticleHandler(db *gorm.DB) *ArticleHandler {
+	return &ArticleHandler{db}
 }
 
 //GetArticles give all articles filtered and paginated by ID
@@ -33,7 +37,7 @@ func (x *ArticleHandler) GetArticles() http.HandlerFunc {
 
 		//TO BE IMPLEMENTED GET ARTICLES AND PAGINATING FROM DB
 
-		var articles []models.Article = mock.Articles
+		articles, err := driver.DBReadAllArticles(x.db, int(payload.Page))
 
 		///////////////////////////////////////////////
 

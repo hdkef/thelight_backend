@@ -2,7 +2,7 @@ package models
 
 //AuthFromServer is how auth from client structured
 type AuthFromClient struct {
-	ID    string
+	ID    uint
 	Name  string
 	Pass  string
 	Token string
@@ -15,8 +15,9 @@ type AuthFromServer struct {
 	NewToken   string
 }
 
+//Settings is how settings format be sent or received
 type Settings struct {
-	ID        string
+	ID        uint
 	Name      string
 	Bio       string
 	AvatarURL string

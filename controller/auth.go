@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"thelight/driver"
 	"thelight/models"
 	"thelight/utils"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"gorm.io/gorm"
 )
 
 const (
@@ -21,11 +23,41 @@ const (
 
 //AuthHandler is a type that contain article handlefunc
 type AuthHandler struct {
+	db *gorm.DB
 }
 
 //NewAuthHandler return new pointer of auth handler
-func NewAuthHandler() *AuthHandler {
-	return &AuthHandler{}
+func NewAuthHandler(db *gorm.DB) *AuthHandler {
+	return &AuthHandler{db}
+}
+
+//Register will handle user registration which first assign avatarURL and Bio
+func (x *AuthHandler) Register() http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+		fmt.Println("Register")
+
+		var payload models.AuthFromClient
+
+		err := json.NewDecoder(req.Body).Decode(&payload)
+		if err != nil {
+			fmt.Println(err)
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		//TOBE IMPLEMENTED HASHING THE PASSWORD
+
+		///////////////////////////////////////
+
+		err = driver.DBAuthInsertUser(x.db, &payload)
+		if err != nil {
+			fmt.Println(err)
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		utils.ResOK(&res, "OK")
+	}
 }
 
 //Login will give jwt and claims to authenticated user
@@ -41,14 +73,22 @@ func (x *AuthHandler) Login() http.HandlerFunc {
 			return
 		}
 
-		//TOBEIMPLEMENTED GET DATA FROM DB
-		user := models.WriterInfo{
-			ID:        "1",
-			AvatarURL: "avatar",
-			Name:      "name",
-			Bio:       "bio",
+		founduser, err := driver.DBAuthReadUser(x.db, payload.Name)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
 		}
-		/////////////////////////////////////
+
+		//TOBE IMPLEMENTED COMPARE HASHED PASSWORD
+
+		////////////////////////////////////////
+
+		user := models.WriterInfo{
+			ID:        founduser.ID,
+			AvatarURL: founduser.AvatarURL,
+			Name:      founduser.Name,
+			Bio:       founduser.Bio,
+		}
 
 		token, err := createToken(&user)
 		if err != nil {
@@ -135,8 +175,13 @@ func newClaimsMap(user *models.WriterInfo) jwt.MapClaims {
 
 	for i := 0; i < userval.NumField(); i++ {
 		fieldName := usertype.Field(i).Name
-		fieldValue := userval.Field(i).String()
-		claims[fieldName] = fieldValue
+		fieldValue := userval.Field(i).Interface()
+		fmt.Println(fieldValue)
+		if userval.Field(i).Kind() == reflect.Uint {
+			claims[fieldName] = fieldValue.(uint)
+		} else {
+			claims[fieldName] = fieldValue
+		}
 	}
 
 	claims["exp"] = time.Now().Unix() + EXPINTEGER
@@ -197,8 +242,11 @@ func checkTokenStringClaims(token *string) (models.WriterInfo, error) {
 
 	var mapClaims jwt.MapClaims = parsedToken.Claims.(jwt.MapClaims)
 
+	//here is a fucking weird, WHY I NEED TO CAST ID TO FLOAT64??
+	//I USE REFLECT TO CREATE JWT MAPS WHICH MEANS ID SUPPOSED TO BE UINT
+
 	claims := models.WriterInfo{
-		ID:        mapClaims["ID"].(string),
+		ID:        uint(mapClaims["ID"].(float64)),
 		Name:      mapClaims["Name"].(string),
 		AvatarURL: mapClaims["AvatarURL"].(string),
 		Bio:       mapClaims["Bio"].(string),

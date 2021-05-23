@@ -7,15 +7,18 @@ import (
 	"thelight/mock"
 	"thelight/models"
 	"thelight/utils"
+
+	"gorm.io/gorm"
 )
 
 //CommentHandler is a type that contain comment handlefunc
 type CommentHandler struct {
+	db *gorm.DB
 }
 
 //NewCommentHandler return new pointer of comment handler
-func NewCommentHandler() *CommentHandler {
-	return &CommentHandler{}
+func NewCommentHandler(db *gorm.DB) *CommentHandler {
+	return &CommentHandler{db}
 }
 
 //GetComments will get all comments

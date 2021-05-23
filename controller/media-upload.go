@@ -44,7 +44,7 @@ func (x *MediaHandler) MediaUpload() http.HandlerFunc {
 			ID:   payload.ID,
 			Type: "mediaFromServer",
 			Media: models.Media{
-				ID:       "id from db",
+				ID:       1000,
 				ImageURL: imgurl,
 			},
 		}
