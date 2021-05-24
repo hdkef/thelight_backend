@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -45,9 +46,14 @@ func (x *AuthHandler) Register() http.HandlerFunc {
 			return
 		}
 
-		//TOBE IMPLEMENTED HASHING THE PASSWORD
+		hashPassByte, err := bcrypt.GenerateFromPassword([]byte(payload.Pass), 10)
+		if err != nil {
+			fmt.Println(err)
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 
-		///////////////////////////////////////
+		payload.Pass = string(hashPassByte)
 
 		err = driver.DBAuthInsertUser(x.db, &payload)
 		if err != nil {
@@ -73,15 +79,17 @@ func (x *AuthHandler) Login() http.HandlerFunc {
 			return
 		}
 
-		user, err := driver.DBAuthReadUser(x.db, payload.Name)
+		hashedpass, user, err := driver.DBAuthReadUser(x.db, payload.Name)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
 		}
 
-		//TOBE IMPLEMENTED COMPARE HASHED PASSWORD
-
-		////////////////////////////////////////
+		err = bcrypt.CompareHashAndPassword([]byte(hashedpass), []byte(payload.Pass))
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 
 		token, err := createToken(&user)
 		if err != nil {

@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"fmt"
 	"strings"
 	"thelight/models"
 
@@ -54,7 +55,7 @@ func DBReadAllArticles(db *gorm.DB, Page int) ([]models.Article, error) {
 	limit := 6
 	offset := (Page - 1) * limit
 
-	rows, err := db.Model(&Article{}).Limit(limit).Offset(offset).Rows()
+	rows, err := db.Table("articles").Joins("JOIN users on users.id = articles.user_id").Offset(offset).Limit(limit).Rows()
 	defer rows.Close()
 	if err != nil {
 		return nil, nil
@@ -63,14 +64,22 @@ func DBReadAllArticles(db *gorm.DB, Page int) ([]models.Article, error) {
 	for rows.Next() {
 		var article Article
 		db.ScanRows(rows, &article)
-		articles = append(articles, models.Article{
-			ID:       article.ID,
-			Date:     article.CreatedAt.String(),
-			Title:    article.Title,
-			Body:     article.Body,
-			ImageURL: article.ImageURL,
-			Tag:      strings.Split(article.Tag, ","),
-		})
+
+		articles = append(articles,
+			models.Article{
+				ID:       article.ID,
+				Title:    article.Title,
+				Date:     article.CreatedAt.String(),
+				Body:     article.Body,
+				ImageURL: article.ImageURL,
+				Tag:      strings.Split(article.Tag, ","),
+				WriterInfo: models.WriterInfo{
+					ID:        article.UserID, //WEIRD, IF ID:article.User.ID it won't retrieve
+					Name:      article.User.Name,
+					AvatarURL: article.User.AvatarURL,
+					Bio:       article.User.Bio,
+				},
+			})
 	}
 
 	return articles, nil
@@ -81,16 +90,25 @@ func DBReadOneArticle(db *gorm.DB, ID uint) (models.Article, error) {
 
 	var article Article
 
-	if err := db.Take(&Article{}, ID).Scan(&article).Error; err != nil {
+	if err := db.First(&Article{}, "articles.id = ?", ID).Joins("JOIN users on users.id = articles.user_id").Scan(&article).Error; err != nil {
 		return models.Article{}, err
 	}
+
+	fmt.Println(article.User)
+
 	return models.Article{
-		ID:       article.ID,
+		ID:       ID,
 		Title:    article.Title,
 		Date:     article.CreatedAt.String(),
 		Body:     article.Body,
 		ImageURL: article.ImageURL,
 		Tag:      strings.Split(article.Tag, ","),
+		WriterInfo: models.WriterInfo{
+			ID:        article.UserID, //WEIRD, IF ID:article.User.ID it won't retrieve
+			Name:      article.User.Name,
+			AvatarURL: article.User.AvatarURL,
+			Bio:       article.User.Bio,
+		},
 	}, nil
 }
 
@@ -107,18 +125,54 @@ func DBAuthInsertUser(db *gorm.DB, payload *models.AuthFromClient) error {
 	return nil
 }
 
-//DBReturnPass will return user information
-func DBAuthReadUser(db *gorm.DB, Name string) (models.WriterInfo, error) {
+//DBReturnPass will return user information to be used for creating claims and hashed pass
+func DBAuthReadUser(db *gorm.DB, Name string) (string, models.WriterInfo, error) {
 
 	var usr User
 
 	if err := db.Where("Name = ?", Name).Take(&User{}).Scan(&usr).Error; err != nil {
-		return models.WriterInfo{}, err
+		return "", models.WriterInfo{}, err
 	}
-	return models.WriterInfo{
+	return usr.Pass, models.WriterInfo{
 		ID:        usr.ID,
 		AvatarURL: usr.AvatarURL,
 		Name:      usr.Name,
 		Bio:       usr.Bio,
 	}, nil
+}
+
+//DBInsertComment to comment table
+func DBInsertComment(db *gorm.DB, payload *models.CommentFromClient) error {
+	if err := db.Create(&Comment{
+		ArticleID: payload.CommentFromClient.ID,
+		Name:      payload.CommentFromClient.Name,
+		Text:      payload.CommentFromClient.Text,
+	}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+//DBReadComments is to get all comments
+func DBReadComments(db *gorm.DB, payload *models.CommentFromClient) ([]models.Comment, error) {
+
+	var comments []models.Comment
+
+	rows, err := db.Find(&Comment{}, "comments.article_id = ?", payload.ID).Rows()
+	if err != nil {
+		return []models.Comment{}, err
+	}
+
+	for rows.Next() {
+		var comment Comment
+		db.ScanRows(rows, &comment)
+
+		comments = append(comments, models.Comment{
+			ID:   comment.ID,
+			Name: comment.Name,
+			Text: comment.Text,
+		})
+	}
+
+	return comments, nil
 }

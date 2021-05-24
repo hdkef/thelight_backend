@@ -16,7 +16,7 @@ type Draft struct {
 type Article struct {
 	gorm.Model
 	UserID   uint
-	User     User
+	User     User      `gorm:"embedded"`
 	Comment  []Comment `gorm:"foreignKey:ArticleID" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Title    string
 	Body     string

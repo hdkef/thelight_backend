@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"thelight/mock"
+	"thelight/driver"
 	"thelight/models"
 	"thelight/utils"
 
@@ -34,11 +34,7 @@ func (x *CommentHandler) GetComments() http.HandlerFunc {
 			return
 		}
 
-		//TOBE IMPLEMENTED GET ALL COMMENTS FROM DB
-
-		var comments []models.Comment = mock.Comments
-
-		///////////////////////////////////////////
+		comments, err := driver.DBReadComments(x.db, &payload)
 
 		response := models.CommentFromServer{
 			CommentsFromServer: comments,
@@ -65,8 +61,13 @@ func (x *CommentHandler) InsertComment() http.HandlerFunc {
 			return
 		}
 
-		//TOBE IMPLEMENTED STORE COMMENT TO DB
+		err = driver.DBInsertComment(x.db, &payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 
-		//////////////////////////////////////
+		utils.ResOK(&res, "OK")
+
 	}
 }
