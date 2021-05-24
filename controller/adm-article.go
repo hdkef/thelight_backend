@@ -9,10 +9,10 @@ import (
 	"thelight/utils"
 )
 
-//SaveArticle will save the article as a draft
+//SaveArticleAs will save the article as a draft
 func (x *ArticleHandler) SaveArticleAs() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("SaveArticle")
+		fmt.Println("SaveArticleAs")
 
 		Token := getTokenHeader(req)
 		claims, err := checkTokenStringClaims(&Token)
@@ -130,5 +130,111 @@ func (x *ArticleHandler) EditArticle() http.HandlerFunc {
 		}
 
 		utils.ResOK(&res, "OK")
+	}
+}
+
+//SaveArticle will save the article in a draft
+func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+		fmt.Println("SaveArticle")
+
+		Token := getTokenHeader(req)
+		claims, err := checkTokenStringClaims(&Token)
+		if err != nil {
+			handleTokenErrClearBearer(&res, &err)
+			return
+		}
+
+		var payload models.ArticleFromClient
+
+		err = json.NewDecoder(req.Body).Decode(&payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		_, err = driver.DBArticleSave(x.db, &payload, &claims)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		utils.ResOK(&res, "OK")
+	}
+}
+
+//GetDraftArticles
+func (x *ArticleHandler) GetDraftAticles() http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+		fmt.Println("GetDraftAticles")
+
+		Token := getTokenHeader(req)
+		claims, err := checkTokenStringClaims(&Token)
+		if err != nil {
+			handleTokenErrClearBearer(&res, &err)
+			return
+		}
+
+		var payload models.ArticleFromClient
+
+		err = json.NewDecoder(req.Body).Decode(&payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		article, err := driver.DBArticleDraftGetAll(x.db, &payload, &claims)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		response := models.ArticleFromServer{
+			ArticlesFromServer: article,
+		}
+
+		err = json.NewEncoder(res).Encode(&response)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+	}
+}
+
+//GetDraftArticle
+func (x *ArticleHandler) GetDraftArticle() http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+		fmt.Println("GetDraftArticle")
+
+		Token := getTokenHeader(req)
+		claims, err := checkTokenStringClaims(&Token)
+		if err != nil {
+			handleTokenErrClearBearer(&res, &err)
+			return
+		}
+
+		var payload models.ArticleFromClient
+
+		err = json.NewDecoder(req.Body).Decode(&payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		article, err := driver.DBArticleDraftGetOne(x.db, &payload, &claims)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		response := models.ArticleFromServer{
+			ArticleFromServer: article,
+		}
+
+		err = json.NewEncoder(res).Encode(&response)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 	}
 }

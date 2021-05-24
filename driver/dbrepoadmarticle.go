@@ -80,3 +80,72 @@ func DBArticleDelete(db *sql.DB, payload *models.ArticleFromClient) error {
 
 	return nil
 }
+
+//DBArticleSave
+func DBArticleSave(db *sql.DB, payload *models.ArticleFromClient, claims *models.WriterInfo) (int64, error) {
+	ctx := context.Background()
+
+	var insertedID int64
+	tag := strings.Join(payload.ArticleFromClient.Tag, ",")
+
+	err := db.QueryRowContext(
+		ctx,
+		"UPDATE drafts SET Title=$1,Body=$2,Tag=$3,ImageURL=$4 WHERE ID=$5 AND USER_REF=$6 RETURNING ID",
+		payload.ArticleFromClient.Title, payload.ArticleFromClient.Body, tag, payload.ArticleFromClient.ImageURL, payload.ArticleFromClient.ID, claims.ID,
+	).Scan(&insertedID)
+	if err != nil {
+		return 0, err
+	}
+
+	return insertedID, nil
+}
+
+//DBArticleDraftGetAll
+func DBArticleDraftGetAll(db *sql.DB, payload *models.ArticleFromClient, claims *models.WriterInfo) ([]models.Article, error) {
+	ctx := context.Background()
+
+	var limit int64 = 6
+	offset := (payload.Page - 1) * limit
+
+	var articles []models.Article
+
+	rows, err := db.QueryContext(
+		ctx,
+		"SELECT ID, Title, Date, Body, Tag, ImageURL FROM articles WHERE USER_REF=$1 LIMIT $2 OFFSET $3",
+		claims.ID, limit, offset,
+	)
+	if err != nil {
+		return articles, err
+	}
+
+	for rows.Next() {
+		var tmp models.Article
+		var tagstring string
+		rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL)
+		tmp.Tag = strings.Split(tagstring, ",")
+		articles = append(articles, tmp)
+	}
+
+	return articles, nil
+}
+
+//DBArticleDraftGetOne
+func DBArticleDraftGetOne(db *sql.DB, payload *models.ArticleFromClient, claims *models.WriterInfo) (models.Article, error) {
+	ctx := context.Background()
+
+	var article models.Article
+	var tagstring string
+
+	err := db.QueryRowContext(
+		ctx,
+		"SELECT ID, Title, Date, Body, Tag, ImageURL FROM drafts WHERE ID=$1 AND USER_REF=$2",
+		payload.ID, claims.ID,
+	).Scan(&article.ID, &article.Title, &article.Date, &article.Body, &tagstring, &article.ImageURL)
+	if err != nil {
+		return article, err
+	}
+
+	article.Tag = strings.Split(tagstring, ",")
+
+	return article, nil
+}

@@ -36,8 +36,11 @@ func main() {
 
 	router.HandleFunc("/article/getall", utils.Cors(article.GetArticles()))
 	router.HandleFunc("/article/getone", utils.Cors(article.GetArticle()))
+	router.HandleFunc("/article/getdrafts", utils.Cors(article.GetDraftAticles()))
+	router.HandleFunc("/article/getdraft", utils.Cors(article.GetDraftArticle()))
 	router.HandleFunc("/article/search", utils.Cors(article.SearchArticles()))
 	router.HandleFunc("/article/saveas", utils.Cors(article.SaveArticleAs()))
+	router.HandleFunc("/article/save", utils.Cors(article.SaveArticle()))
 	router.HandleFunc("/article/publish", utils.Cors(article.PublishArticle()))
 	router.HandleFunc("/article/delete", utils.Cors(article.DeleteArticle()))
 	router.HandleFunc("/article/edit", utils.Cors(article.EditArticle()))

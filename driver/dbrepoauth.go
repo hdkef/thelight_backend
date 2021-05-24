@@ -50,6 +50,38 @@ func DBAuthLogin(db *sql.DB, payload *models.AuthFromClient) (string, models.Wri
 }
 
 //DBAuthSettings
-func DBAuthSettings(db *sql.DB) (models.AuthFromClient, error) {
-	return models.AuthFromClient{}, nil
+func DBAuthSettings(db *sql.DB, payload *models.Settings) error {
+	ctx := context.Background()
+
+	tx, err := db.BeginTx(ctx, nil)
+	defer tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	if payload.Bio != "" {
+		_, err = tx.ExecContext(ctx, "UPDATE users SET Bio=$1 WHERE ID=$2", payload.Bio, payload.ID)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if payload.Name != "" {
+		_, err = tx.ExecContext(ctx, "UPDATE users SET Name=$1 WHERE ID=$2", payload.Name, payload.ID)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if payload.AvatarURL != "" {
+		_, err = tx.ExecContext(ctx, "UPDATE users SET AvatarURL=$1 WHERE ID=$2", payload.AvatarURL, payload.ID)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return nil
 }

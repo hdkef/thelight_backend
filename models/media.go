@@ -6,6 +6,7 @@ import "github.com/gorilla/websocket"
 type Media struct {
 	ID       int64
 	ImageURL string
+	UserRef  int64
 }
 
 //how client and server communication JSON is structured
@@ -16,4 +17,5 @@ type MediaPayload struct {
 	Token  string
 	Medias []Media
 	Media  Media
+	Page   int64
 }

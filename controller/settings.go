@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"thelight/driver"
 	"thelight/models"
 	"thelight/utils"
 )
@@ -29,16 +30,8 @@ func (x *AuthHandler) Settings() http.HandlerFunc {
 		}
 
 		payload.ID = claims.ID
-		Name := req.FormValue("Name")
-		Bio := req.FormValue("Bio")
-
-		if Name != "" {
-			payload.Name = Name
-		}
-
-		if Bio != "" {
-			payload.Bio = Bio
-		}
+		payload.Name = req.FormValue("Name")
+		payload.Bio = req.FormValue("Bio")
 
 		imgurl, err := storeImage(req, "Avatar", "Avatar")
 
@@ -49,9 +42,12 @@ func (x *AuthHandler) Settings() http.HandlerFunc {
 			//DO NOTHING
 		} else {
 			payload.AvatarURL = imgurl
-			//TOBE IMPLEMENTED STORE IMGURL TO DB
+		}
 
-			////////////////////////////////////
+		err = driver.DBAuthSettings(x.db, &payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
 		}
 
 		err = json.NewEncoder(res).Encode(&payload)

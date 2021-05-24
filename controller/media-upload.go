@@ -16,16 +16,16 @@ func (x *MediaHandler) MediaUpload() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		fmt.Println("MediaUpload")
 
-		err := req.ParseMultipartForm(1024)
-		if err != nil {
-			utils.ResErr(&res, http.StatusInternalServerError, err)
-			return
-		}
-
 		Token := getTokenHeader(req)
 		claims, err := checkTokenStringClaims(&Token)
 		if err != nil {
 			handleTokenErrClearBearer(&res, &err)
+			return
+		}
+
+		err = req.ParseMultipartForm(1024)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
 		}
 
@@ -34,8 +34,6 @@ func (x *MediaHandler) MediaUpload() http.HandlerFunc {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
 		}
-
-		//TOBE IMPLEMENTED SAVE IMGURL TO DB
 
 		id, err := driver.DBMediaInsert(x.db, imgurl, &claims)
 		if err != nil {
@@ -52,8 +50,6 @@ func (x *MediaHandler) MediaUpload() http.HandlerFunc {
 			},
 		}
 
-		////////////////////////////////////
-
 		go afterStoreImage(&response)
 
 		utils.ResOK(&res, "IMAGE STORED")
@@ -66,7 +62,9 @@ func afterStoreImage(response *models.MediaPayload) {
 
 	ws := onlineMap[response.ID]
 
-	ws.WriteJSON(response)
+	if ws != nil {
+		ws.WriteJSON(response)
+	}
 }
 
 //store image will store image and return image path / dir
