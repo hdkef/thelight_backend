@@ -4,13 +4,13 @@ import "github.com/gorilla/websocket"
 
 //how media is structured
 type Media struct {
-	ID       uint
+	ID       int64
 	ImageURL string
 }
 
 //how client and server communication JSON is structured
 type MediaPayload struct {
-	ID     uint
+	ID     int64
 	Type   string
 	Conn   *websocket.Conn
 	Token  string

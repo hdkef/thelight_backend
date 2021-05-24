@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"thelight/driver"
 	"thelight/models"
 	"thelight/utils"
 )
@@ -14,8 +15,6 @@ import (
 func (x *MediaHandler) MediaUpload() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		fmt.Println("MediaUpload")
-
-		var payload models.MediaPayload
 
 		err := req.ParseMultipartForm(1024)
 		if err != nil {
@@ -30,8 +29,6 @@ func (x *MediaHandler) MediaUpload() http.HandlerFunc {
 			return
 		}
 
-		payload.ID = claims.ID
-
 		imgurl, err := storeImage(req, "Image", "Image")
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
@@ -40,11 +37,17 @@ func (x *MediaHandler) MediaUpload() http.HandlerFunc {
 
 		//TOBE IMPLEMENTED SAVE IMGURL TO DB
 
+		id, err := driver.DBMediaInsert(x.db, imgurl, &claims)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
 		response := models.MediaPayload{
-			ID:   payload.ID,
+			ID:   claims.ID,
 			Type: "mediaFromServer",
 			Media: models.Media{
-				ID:       1000,
+				ID:       id,
 				ImageURL: imgurl,
 			},
 		}

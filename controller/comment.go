@@ -1,23 +1,22 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"thelight/driver"
 	"thelight/models"
 	"thelight/utils"
-
-	"gorm.io/gorm"
 )
 
 //CommentHandler is a type that contain comment handlefunc
 type CommentHandler struct {
-	db *gorm.DB
+	db *sql.DB
 }
 
 //NewCommentHandler return new pointer of comment handler
-func NewCommentHandler(db *gorm.DB) *CommentHandler {
+func NewCommentHandler(db *sql.DB) *CommentHandler {
 	return &CommentHandler{db}
 }
 
@@ -34,7 +33,7 @@ func (x *CommentHandler) GetComments() http.HandlerFunc {
 			return
 		}
 
-		comments, err := driver.DBReadComments(x.db, &payload)
+		comments, err := driver.DBCommentGetAll(x.db, &payload)
 
 		response := models.CommentFromServer{
 			CommentsFromServer: comments,
@@ -61,7 +60,38 @@ func (x *CommentHandler) InsertComment() http.HandlerFunc {
 			return
 		}
 
-		err = driver.DBInsertComment(x.db, &payload)
+		_, err = driver.DBCommentInsert(x.db, &payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		utils.ResOK(&res, "OK")
+
+	}
+}
+
+//DeleteComment will insert one comment
+func (x *CommentHandler) DeleteComment() http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+		fmt.Println("DeleteComment")
+
+		Token := getTokenHeader(req)
+		err := checkTokenStringErr(&Token)
+		if err != nil {
+			handleTokenErrClearBearer(&res, &err)
+			return
+		}
+
+		var payload models.CommentFromClient
+
+		err = json.NewDecoder(req.Body).Decode(&payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		err = driver.DBCommentDelete(x.db, &payload)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return

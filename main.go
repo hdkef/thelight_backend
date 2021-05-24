@@ -19,9 +19,8 @@ func init() {
 
 func main() {
 
-	db := driver.InitiateDB()
-	pg, _ := db.DB()
-	defer pg.Close()
+	db, _ := driver.InitiateDB()
+	defer db.Close()
 
 	var auth = controller.NewAuthHandler(db)
 	var article = controller.NewArticleHandler(db)
@@ -38,13 +37,14 @@ func main() {
 	router.HandleFunc("/article/getall", utils.Cors(article.GetArticles()))
 	router.HandleFunc("/article/getone", utils.Cors(article.GetArticle()))
 	router.HandleFunc("/article/search", utils.Cors(article.SearchArticles()))
-	router.HandleFunc("/article/save", utils.Cors(article.SaveArticle()))
+	router.HandleFunc("/article/saveas", utils.Cors(article.SaveArticleAs()))
 	router.HandleFunc("/article/publish", utils.Cors(article.PublishArticle()))
 	router.HandleFunc("/article/delete", utils.Cors(article.DeleteArticle()))
 	router.HandleFunc("/article/edit", utils.Cors(article.EditArticle()))
 
 	router.HandleFunc("/comment/getall", utils.Cors(comment.GetComments()))
 	router.HandleFunc("/comment/insert", utils.Cors(comment.InsertComment()))
+	router.HandleFunc("/comment/delete", utils.Cors(comment.DeleteComment()))
 
 	router.HandleFunc("/media/ws", utils.Cors(media.Media()))
 	router.HandleFunc("/media/upload", utils.Cors(media.MediaUpload()))

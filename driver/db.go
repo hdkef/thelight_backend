@@ -1,33 +1,29 @@
 package driver
 
 import (
-	"fmt"
-	"log"
+	"database/sql"
 	"os"
+	"time"
 
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/lib/pq"
 )
 
 //InitiateDB return a pointer to db conn
-func InitiateDB() *gorm.DB {
+func InitiateDB() (*sql.DB, error) {
 
-	host := os.Getenv("PGHOST")
-	user := os.Getenv("PGUSER")
-	pass := os.Getenv("PGPASS")
-	dbname := os.Getenv("PGDBNAME")
-	port := os.Getenv("PGPORT")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable Timezone=Asia/Makassar", host, user, pass, dbname, port)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		SkipDefaultTransaction: true,
-	})
+	pgURL, err := pq.ParseURL(os.Getenv("DB_URL"))
+
 	if err != nil {
-		log.Fatal(err)
-		panic(err)
+		return nil, err
 	}
 
-	db.AutoMigrate(&Article{}, &User{}, &Comment{}, &Media{}, &Draft{})
-
-	return db
+	db, _ := sql.Open("postgres", pgURL)
+	for {
+		err := db.Ping()
+		if err == nil {
+			return db, nil
+		}
+		time.Sleep(5000 * time.Millisecond)
+	}
 
 }

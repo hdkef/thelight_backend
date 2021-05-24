@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,7 +15,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 const (
@@ -24,11 +24,11 @@ const (
 
 //AuthHandler is a type that contain article handlefunc
 type AuthHandler struct {
-	db *gorm.DB
+	db *sql.DB
 }
 
 //NewAuthHandler return new pointer of auth handler
-func NewAuthHandler(db *gorm.DB) *AuthHandler {
+func NewAuthHandler(db *sql.DB) *AuthHandler {
 	return &AuthHandler{db}
 }
 
@@ -55,7 +55,7 @@ func (x *AuthHandler) Register() http.HandlerFunc {
 
 		payload.Pass = string(hashPassByte)
 
-		err = driver.DBAuthInsertUser(x.db, &payload)
+		_, err = driver.DBAuthRegister(x.db, &payload)
 		if err != nil {
 			fmt.Println(err)
 			utils.ResErr(&res, http.StatusInternalServerError, err)
@@ -79,7 +79,7 @@ func (x *AuthHandler) Login() http.HandlerFunc {
 			return
 		}
 
-		hashedpass, user, err := driver.DBAuthReadUser(x.db, payload.Name)
+		hashedpass, user, err := driver.DBAuthLogin(x.db, &payload)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
@@ -178,8 +178,8 @@ func newClaimsMap(user *models.WriterInfo) jwt.MapClaims {
 		fieldName := usertype.Field(i).Name
 		fieldValue := userval.Field(i).Interface()
 		fmt.Println(fieldValue)
-		if userval.Field(i).Kind() == reflect.Uint {
-			claims[fieldName] = fieldValue.(uint)
+		if userval.Field(i).Kind() == reflect.Int64 {
+			claims[fieldName] = fieldValue.(int64)
 		} else {
 			claims[fieldName] = fieldValue
 		}
@@ -247,7 +247,7 @@ func checkTokenStringClaims(token *string) (models.WriterInfo, error) {
 	//I USE REFLECT TO CREATE JWT MAPS WHICH MEANS ID SUPPOSED TO BE UINT
 
 	claims := models.WriterInfo{
-		ID:        uint(mapClaims["ID"].(float64)),
+		ID:        int64(mapClaims["ID"].(float64)),
 		Name:      mapClaims["Name"].(string),
 		AvatarURL: mapClaims["AvatarURL"].(string),
 		Bio:       mapClaims["Bio"].(string),

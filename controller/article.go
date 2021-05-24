@@ -1,24 +1,22 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"thelight/driver"
-	"thelight/mock"
 	"thelight/models"
 	"thelight/utils"
-
-	"gorm.io/gorm"
 )
 
 //ArticleHandler is a type that contain article handlefunc
 type ArticleHandler struct {
-	db *gorm.DB
+	db *sql.DB
 }
 
 //NewArticleHandler return new pointer of article handler
-func NewArticleHandler(db *gorm.DB) *ArticleHandler {
+func NewArticleHandler(db *sql.DB) *ArticleHandler {
 	return &ArticleHandler{db}
 }
 
@@ -35,7 +33,7 @@ func (x *ArticleHandler) GetArticles() http.HandlerFunc {
 			return
 		}
 
-		articles, err := driver.DBReadAllArticles(x.db, int(payload.Page))
+		articles, err := driver.DBArticleGetAll(x.db, &payload)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
@@ -66,7 +64,7 @@ func (x *ArticleHandler) GetArticle() http.HandlerFunc {
 			return
 		}
 
-		article, err := driver.DBReadOneArticle(x.db, payload.ID)
+		article, err := driver.DBArticleGetOne(x.db, &payload)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
@@ -97,11 +95,11 @@ func (x *ArticleHandler) SearchArticles() http.HandlerFunc {
 			return
 		}
 
-		//TO BE IMPLEMENTED GET ARTICLES AND PAGINATING FROM DB FILTERED BY KEY
-
-		var articles []models.Article = mock.Articles
-
-		///////////////////////////////////////////////
+		articles, err := driver.DBArticleSearch(x.db, &payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 
 		response := models.ArticleFromServer{
 			ArticlesFromServer: articles,

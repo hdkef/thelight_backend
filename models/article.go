@@ -2,7 +2,7 @@ package models
 
 //Article is how article structured
 type Article struct {
-	ID         uint
+	ID         int64
 	Date       string
 	Title      string
 	Preview    string
@@ -14,7 +14,7 @@ type Article struct {
 
 //ArticleFromClient is how article from client structured
 type ArticleFromClient struct {
-	ID                uint
+	ID                int64
 	Page              int64
 	Filter            string
 	Key               string

@@ -10,7 +10,7 @@ import (
 )
 
 //SaveArticle will save the article as a draft
-func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
+func (x *ArticleHandler) SaveArticleAs() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		fmt.Println("SaveArticle")
 
@@ -29,14 +29,14 @@ func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
 			return
 		}
 
-		insertedID, err := driver.DBSaveArticle(x.db, &payload, claims.ID)
+		insertedID, err := driver.DBArticleSaveAs(x.db, &payload, &claims)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
 		}
 
 		json.NewEncoder(res).Encode(struct {
-			ID uint
+			ID int64
 		}{
 			insertedID,
 		})
@@ -63,7 +63,7 @@ func (x *ArticleHandler) PublishArticle() http.HandlerFunc {
 			return
 		}
 
-		err = driver.DBPublishArticle(x.db, &payload, claims.ID)
+		_, err = driver.DBArticlePublish(x.db, &payload, &claims)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
@@ -93,7 +93,7 @@ func (x *ArticleHandler) DeleteArticle() http.HandlerFunc {
 			return
 		}
 
-		err = driver.DBDeleteArticle(x.db, payload.ID)
+		err = driver.DBArticleDelete(x.db, &payload)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
@@ -123,9 +123,11 @@ func (x *ArticleHandler) EditArticle() http.HandlerFunc {
 			return
 		}
 
-		//TOBE IMPLEMENTED UPDATE ARTICLE IN RELEASED
-
-		/////////////////////////////////////////////
+		_, err = driver.DBArticleEdit(x.db, &payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
 
 		utils.ResOK(&res, "OK")
 	}
