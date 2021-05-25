@@ -3,21 +3,24 @@ package driver
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"thelight/models"
 )
 
 //DBMediaGetAll
-func DBMediaGetAll(db *sql.DB, payload *models.MediaPayload) ([]models.Media, error) {
+func DBMediaGetAll(payload *models.MediaPayload) ([]models.Media, error) {
 	ctx := context.Background()
+
+	fmt.Println("page", payload.Page)
 
 	var limit int64 = 6
 	offset := (payload.Page - 1) * limit
 
 	var medias []models.Media
 
-	rows, err := db.QueryContext(
+	rows, err := payload.DB.QueryContext(
 		ctx,
-		"SELECT ID, ImageURL, USER_REF from medias WHERE ID=$1 OFFSET $2 LIMIT $3",
+		"SELECT ID, ImageURL, USER_REF from medias WHERE USER_REF=$1 OFFSET $2 LIMIT $3",
 		payload.ID, offset, limit,
 	)
 	if err != nil {

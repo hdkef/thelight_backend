@@ -1,6 +1,10 @@
 package models
 
-import "github.com/gorilla/websocket"
+import (
+	"database/sql"
+
+	"github.com/gorilla/websocket"
+)
 
 //how media is structured
 type Media struct {
@@ -18,4 +22,5 @@ type MediaPayload struct {
 	Medias []Media
 	Media  Media
 	Page   int64
+	DB     *sql.DB
 }

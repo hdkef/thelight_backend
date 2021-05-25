@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"thelight/mock"
+	"thelight/driver"
 	"thelight/models"
 	"time"
 
@@ -59,17 +59,18 @@ func (x *MediaHandler) Media() http.HandlerFunc {
 
 		ctx, cancel := context.WithCancel(context.Background())
 
-		go readAndSend(cancel, ws)
+		go readAndSend(cancel, ws, x.db)
 		go receiveAndHandle(ctx)
 	}
 }
 
 //readAndSend read incoming payload, assign websocket.Conn to payload and send to corresponding channel
-func readAndSend(cancel context.CancelFunc, ws *websocket.Conn) {
+func readAndSend(cancel context.CancelFunc, ws *websocket.Conn, DB *sql.DB) {
 	fmt.Println("readAndSend")
 
 	var payload models.MediaPayload = models.MediaPayload{
 		Conn: ws,
+		DB:   DB,
 	}
 	defer cancel()
 
@@ -118,9 +119,12 @@ func initFromClient(payload models.MediaPayload) {
 
 	go pingPonger(payload.ID, payload.Conn)
 
-	//TOBE IMPLEMENTED GET ALL IMAGE DIRS FROM DB AND VERIFY TOKEN
-	medias := mock.Medias
-	/////////////////////////////////////////////
+	medias, err := driver.DBMediaGetAll(&payload)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	response := models.MediaPayload{
 		ID:     payload.ID,
 		Type:   "initFromServer",
@@ -169,9 +173,12 @@ func pagingFromClient(payload models.MediaPayload) {
 		return
 	}
 
-	//TOBE IMPLEMENTED GET ALL IMAGE DIRS FROM DB AND VERIFY TOKEN
-	medias := mock.Medias
-	/////////////////////////////////////////////
+	medias, err := driver.DBMediaGetAll(&payload)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	response := models.MediaPayload{
 		ID:     payload.ID,
 		Type:   "pagingFromServer",
