@@ -1,9 +1,9 @@
 CREATE TABLE users (ID serial primary key, Name VARCHAR(80), Pass TEXT, AvatarURL TEXT, BIO TEXT);
 
-CREATE TABLE articles (ID serial primary key, Title TEXT, Date Date, Body TEXT, Tag TEXT, ImageURL TEXT, USER_REF INTEGER REFERENCES users(ID));
+CREATE TABLE articles (ID serial primary key, Title TEXT, Date Date, Body TEXT, Tag TEXT, ImageURL TEXT, USER_REF INTEGER REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE);
 
-CREATE TABLE drafts (ID serial primary key, Title TEXT, Date Date, Body TEXT, Tag TEXT, ImageURL TEXT, USER_REF INTEGER REFERENCES users(ID));
+CREATE TABLE drafts (ID serial primary key, Title TEXT, Date Date, Body TEXT, Tag TEXT, ImageURL TEXT, USER_REF INTEGER REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE);
 
-CREATE TABLE comments (ID serial primary key, Name VARCHAR(80), Text VARCHAR(300), ARTICLE_REF INTEGER REFERENCES articles(ID));
+CREATE TABLE comments (ID serial primary key, Name VARCHAR(80), Text VARCHAR(300), ARTICLE_REF INTEGER REFERENCES articles(ID) ON DELETE CASCADE ON UPDATE CASCADE);
 
-CREATE TABLE medias (ID serial primary key, ImageURL TEXT , USER_REF INTEGER REFERENCES users(ID));
+CREATE TABLE medias (ID serial primary key, ImageURL TEXT , USER_REF INTEGER REFERENCES users(ID) ON DELETE CASCADE ON UPDATE CASCADE);

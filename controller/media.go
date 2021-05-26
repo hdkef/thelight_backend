@@ -128,6 +128,7 @@ func initFromClient(payload models.MediaPayload) {
 	response := models.MediaPayload{
 		ID:     payload.ID,
 		Type:   "initFromServer",
+		Page:   1,
 		Medias: medias,
 	}
 
@@ -174,7 +175,7 @@ func pagingFromClient(payload models.MediaPayload) {
 	}
 
 	medias, err := driver.DBMediaGetAll(&payload)
-	if err != nil {
+	if err != nil || len(medias) == 0 {
 		fmt.Println(err)
 		return
 	}
@@ -182,6 +183,7 @@ func pagingFromClient(payload models.MediaPayload) {
 	response := models.MediaPayload{
 		ID:     payload.ID,
 		Type:   "pagingFromServer",
+		Page:   payload.Page,
 		Medias: medias,
 	}
 
