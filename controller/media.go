@@ -175,7 +175,7 @@ func pagingFromClient(payload models.MediaPayload) {
 	}
 
 	medias, err := driver.DBMediaGetAll(&payload)
-	if err != nil || len(medias) == 0 {
+	if err != nil {
 		fmt.Println(err)
 		return
 	}

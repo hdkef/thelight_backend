@@ -3,6 +3,7 @@ package driver
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"thelight/models"
 )
 
@@ -18,13 +19,20 @@ func DBCommentGetAll(db *sql.DB, payload *models.CommentFromClient) ([]models.Co
 		payload.ID,
 	)
 	if err != nil {
-		return comments, err
+		return nil, err
 	}
 
 	for rows.Next() {
 		var tmp models.Comment
-		rows.Scan(&tmp.ID, &tmp.Name, &tmp.Text)
+		err = rows.Scan(&tmp.ID, &tmp.Name, &tmp.Text)
+		if err != nil {
+			return nil, err
+		}
 		comments = append(comments, tmp)
+	}
+
+	if len(comments) == 0 {
+		return nil, errors.New("NO RESULT")
 	}
 
 	return comments, nil

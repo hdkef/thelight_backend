@@ -115,13 +115,16 @@ func DBArticleDraftGetAll(db *sql.DB, payload *models.ArticleFromClient, claims 
 		claims.ID, limit, offset,
 	)
 	if err != nil {
-		return articles, err
+		return nil, err
 	}
 
 	for rows.Next() {
 		var tmp models.Article
 		var tagstring string
-		rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL)
+		err = rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL)
+		if err != nil {
+			return nil, err
+		}
 		tmp.Tag = strings.Split(tagstring, ",")
 		articles = append(articles, tmp)
 	}

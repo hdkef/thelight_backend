@@ -3,6 +3,7 @@ package driver
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"thelight/models"
 )
@@ -24,13 +25,20 @@ func DBMediaGetAll(payload *models.MediaPayload) ([]models.Media, error) {
 		payload.ID, offset, limit,
 	)
 	if err != nil {
-		return []models.Media{}, err
+		return nil, err
 	}
 
 	for rows.Next() {
 		var tmp models.Media
-		rows.Scan(&tmp.ID, &tmp.ImageURL, &tmp.UserRef)
+		err = rows.Scan(&tmp.ID, &tmp.ImageURL, &tmp.UserRef) //THIS IS WEIRD, IF NO RESULT WILL NOT RETURN ERROR
+		if err != nil {
+			return nil, err
+		}
 		medias = append(medias, tmp)
+	}
+
+	if len(medias) == 0 {
+		return nil, errors.New("NO RESULT")
 	}
 
 	return medias, nil

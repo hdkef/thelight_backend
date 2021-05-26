@@ -23,15 +23,22 @@ func DBArticleGetAll(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 		limit, offset,
 	)
 	if err != nil {
-		return articles, err
+		return nil, err
 	}
 
 	for rows.Next() {
 		var tmp models.Article
 		var tagstring string
-		rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL, &tmp.WriterInfo.ID, &tmp.WriterInfo.Name, &tmp.WriterInfo.AvatarURL, &tmp.WriterInfo.Bio)
+		err = rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL, &tmp.WriterInfo.ID, &tmp.WriterInfo.Name, &tmp.WriterInfo.AvatarURL, &tmp.WriterInfo.Bio)
+		if err != nil {
+			return nil, err
+		}
 		tmp.Tag = strings.Split(tagstring, ",")
 		articles = append(articles, tmp)
+	}
+
+	if len(articles) == 0 {
+		return nil, errors.New("NO RESULT")
 	}
 
 	return articles, nil
@@ -85,19 +92,26 @@ func DBArticleSearch(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 			payload.Key, limit, offset,
 		)
 	} else {
-		return []models.Article{}, errors.New("NO FILTER METHOD FOUND")
+		return nil, errors.New("NO FILTER METHOD FOUND")
 	}
 
 	if err != nil {
-		return articles, err
+		return nil, err
 	}
 
 	for rows.Next() {
 		var tmp models.Article
 		var tagstring string
-		rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL, &tmp.WriterInfo.ID, &tmp.WriterInfo.Name, &tmp.WriterInfo.AvatarURL, &tmp.WriterInfo.Bio)
+		err = rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL, &tmp.WriterInfo.ID, &tmp.WriterInfo.Name, &tmp.WriterInfo.AvatarURL, &tmp.WriterInfo.Bio)
+		if err != nil {
+			return nil, err
+		}
 		tmp.Tag = strings.Split(tagstring, ",")
 		articles = append(articles, tmp)
+	}
+
+	if len(articles) == 0 {
+		return nil, errors.New("NO RESULT")
 	}
 
 	return articles, nil
