@@ -18,7 +18,7 @@ func DBArticleGetAll(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 
 	rows, err := db.QueryContext(
 		ctx,
-		"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles FULL JOIN users ON users.ID = articles.User_Ref WHERE articles.ID > $1 LIMIT $2",
+		"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles FULL JOIN users ON users.ID = articles.User_Ref WHERE articles.ID > $1 ORDER BY articles.ID ASC LIMIT $2",
 		payload.LastID, limit,
 	)
 	if err != nil {
@@ -69,7 +69,6 @@ func DBArticleSearch(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 	ctx := context.Background()
 
 	var limit int64 = 6
-	offset := (payload.Page - 1) * limit
 
 	var articles []models.Article
 
@@ -81,14 +80,14 @@ func DBArticleSearch(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 	if payload.Filter == "Tag" {
 		rows, err = db.QueryContext(
 			ctx,
-			"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles JOIN users ON users.ID = articles.User_Ref WHERE articles.Tag LIKE '%' || $1 || '%' LIMIT $2 OFFSET $3",
-			payload.Key, limit, offset,
+			"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles JOIN users ON users.ID = articles.User_Ref WHERE articles.Tag LIKE '%' || $1 || '%' AND articles.ID > $2 ORDER BY articles.ID ASC LIMIT $3",
+			payload.Key, payload.LastID, limit,
 		)
 	} else if payload.Filter == "Title" {
 		rows, err = db.QueryContext(
 			ctx,
-			"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles JOIN users ON users.ID = articles.User_Ref WHERE articles.Title LIKE '%' || $1 || '%' LIMIT $2 OFFSET $3",
-			payload.Key, limit, offset,
+			"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles JOIN users ON users.ID = articles.User_Ref WHERE articles.Title LIKE '%' || $1 || '%' AND articles.ID > $2 ORDER BY articles.ID ASC LIMIT $3",
+			payload.Key, payload.LastID, limit,
 		)
 	} else {
 		return nil, errors.New("NO FILTER METHOD FOUND")
