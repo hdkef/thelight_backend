@@ -15,7 +15,8 @@ type Article struct {
 //ArticleFromClient is how article from client structured
 type ArticleFromClient struct {
 	ID                int64
-	Page              int64
+	Page              int64 //Stop using offset with limit to paginate,  where ID > and LIMIT instead
+	LastID            int64 //but still temporarily use that method for search article, drafts articles, and media until caching logic done
 	Filter            string
 	Key               string
 	ArticleFromClient Article

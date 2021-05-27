@@ -13,14 +13,13 @@ func DBArticleGetAll(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 	ctx := context.Background()
 
 	var limit int64 = 6
-	offset := (payload.Page - 1) * limit
 
 	var articles []models.Article
 
 	rows, err := db.QueryContext(
 		ctx,
-		"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles FULL JOIN users ON users.ID = articles.User_Ref LIMIT $1 OFFSET $2",
-		limit, offset,
+		"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles FULL JOIN users ON users.ID = articles.User_Ref WHERE articles.ID > $1 LIMIT $2",
+		payload.LastID, limit,
 	)
 	if err != nil {
 		return nil, err
