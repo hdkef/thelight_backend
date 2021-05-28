@@ -127,7 +127,7 @@ func initFromClient(payload models.MediaPayload) {
 
 	response := models.MediaPayload{
 		ID:     payload.ID,
-		Type:   "initFromServer",
+		Type:   "pagingFromServer",
 		Page:   1,
 		Medias: medias,
 	}

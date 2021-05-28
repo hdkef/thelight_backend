@@ -12,17 +12,16 @@ import (
 func DBMediaGetAll(payload *models.MediaPayload) ([]models.Media, error) {
 	ctx := context.Background()
 
-	fmt.Println("page", payload.Page)
+	fmt.Println("page hit ", payload.Page, payload)
 
 	var limit int64 = 6
-	offset := (payload.Page - 1) * limit
 
 	var medias []models.Media
 
 	rows, err := payload.DB.QueryContext(
 		ctx,
-		"SELECT ID, ImageURL, USER_REF from medias WHERE USER_REF=$1 OFFSET $2 LIMIT $3",
-		payload.ID, offset, limit,
+		"SELECT medias.ID, medias.ImageURL, medias.USER_REF from medias WHERE USER_REF=$1 AND medias.ID > $2 ORDER BY medias.ID ASC LIMIT $3",
+		payload.ID, payload.LastID, limit,
 	)
 	if err != nil {
 		return nil, err

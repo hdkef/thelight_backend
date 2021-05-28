@@ -16,6 +16,7 @@ type Media struct {
 //how client and server communication JSON is structured
 type MediaPayload struct {
 	ID     int64
+	LastID int64
 	Type   string
 	Conn   *websocket.Conn
 	Token  string
