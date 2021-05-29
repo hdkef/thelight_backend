@@ -105,14 +105,13 @@ func DBArticleDraftGetAll(db *sql.DB, payload *models.ArticleFromClient, claims 
 	ctx := context.Background()
 
 	var limit int64 = 6
-	offset := (payload.Page - 1) * limit
 
 	var articles []models.Article
 
 	rows, err := db.QueryContext(
 		ctx,
-		"SELECT ID, Title, Date, Body, Tag, ImageURL FROM articles WHERE USER_REF=$1 LIMIT $2 OFFSET $3",
-		claims.ID, limit, offset,
+		"SELECT ID, Title, Date, Body, Tag, ImageURL FROM drafts WHERE USER_REF=$1 AND ID > $2 LIMIT $3",
+		claims.ID, payload.LastID, limit,
 	)
 	if err != nil {
 		return nil, err

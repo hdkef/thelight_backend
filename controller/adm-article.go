@@ -166,7 +166,7 @@ func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
 //GetDraftArticles
 func (x *ArticleHandler) GetDraftAticles() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("GetDraftAticles")
+		fmt.Println("GetDraftArticles")
 
 		Token := getTokenHeader(req)
 		claims, err := checkTokenStringClaims(&Token)
