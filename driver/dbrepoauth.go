@@ -11,7 +11,7 @@ const (
 	NEWUSR_BIO       = "Hi! i am a writer"
 )
 
-//DBAuthRegister
+//DBAuthRegister store new user in user database
 func DBAuthRegister(db *sql.DB, payload *models.AuthFromClient) (int64, error) {
 	ctx := context.Background()
 
@@ -30,7 +30,7 @@ func DBAuthRegister(db *sql.DB, payload *models.AuthFromClient) (int64, error) {
 	return insertedID, nil
 }
 
-//DBAuthLogin
+//DBAuthLogin return hashed pass of user, and give writerInfo (for creating claims later)
 func DBAuthLogin(db *sql.DB, payload *models.AuthFromClient) (string, models.WriterInfo, error) {
 	ctx := context.Background()
 
@@ -49,7 +49,7 @@ func DBAuthLogin(db *sql.DB, payload *models.AuthFromClient) (string, models.Wri
 	return hpass, writerinfo, nil
 }
 
-//DBAuthSettings
+//DBAuthSettings will update user's settings, like bio, name etc
 func DBAuthSettings(db *sql.DB, payload *models.Settings) error {
 	ctx := context.Background()
 

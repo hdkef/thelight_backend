@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"thelight/driver"
@@ -49,7 +48,6 @@ var pagingFromClientChan chan models.MediaPayload = make(chan models.MediaPayloa
 //Media will handle websocket connection to media
 func (x *MediaHandler) Media() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("Media")
 
 		ws, err := upgrader.Upgrade(res, req, res.Header())
 		if err != nil {
@@ -66,7 +64,6 @@ func (x *MediaHandler) Media() http.HandlerFunc {
 
 //readAndSend read incoming payload, assign websocket.Conn to payload and send to corresponding channel
 func readAndSend(cancel context.CancelFunc, ws *websocket.Conn, DB *sql.DB) {
-	fmt.Println("readAndSend")
 
 	var payload models.MediaPayload = models.MediaPayload{
 		Conn: ws,
@@ -91,7 +88,6 @@ func readAndSend(cancel context.CancelFunc, ws *websocket.Conn, DB *sql.DB) {
 
 //receiveAndHandle receive payload from channel and handle to corresponding function
 func receiveAndHandle(ctx context.Context) {
-	fmt.Println("receiveAndHandle")
 	for {
 		select {
 		case <-ctx.Done():
@@ -106,7 +102,6 @@ func receiveAndHandle(ctx context.Context) {
 
 //initFromClient handle initFromClient payload type
 func initFromClient(payload models.MediaPayload) {
-	fmt.Println("initFromClient")
 
 	valid := verifyTokenForWS(&payload.Token, payload.Conn)
 	if valid == false {
@@ -115,13 +110,10 @@ func initFromClient(payload models.MediaPayload) {
 
 	onlineMap[payload.ID] = payload.Conn
 
-	fmt.Println("onlineMap : ", onlineMap)
-
 	go pingPonger(payload.ID, payload.Conn)
 
 	medias, err := driver.DBMediaGetAll(&payload)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
@@ -137,7 +129,6 @@ func initFromClient(payload models.MediaPayload) {
 
 //pingPonger will ping websocket conn and delete onlineMap if return error for defined time range
 func pingPonger(ID int64, ws *websocket.Conn) {
-	fmt.Println("pingPonger")
 
 	ws.SetPongHandler(func(appData string) error {
 		ws.SetReadDeadline(time.Now().Add(pongWait))
@@ -151,13 +142,11 @@ func pingPonger(ID int64, ws *websocket.Conn) {
 		if onlineMap[ID] == ws {
 			delete(onlineMap, ID)
 		}
-		fmt.Println("onlineMap : ", onlineMap)
 	}()
 
 	for {
 		select {
 		case <-timer.C:
-			fmt.Println("tick")
 			if err := ws.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
@@ -167,7 +156,6 @@ func pingPonger(ID int64, ws *websocket.Conn) {
 
 //pagingFromClient handle pagingFromClient payload type
 func pagingFromClient(payload models.MediaPayload) {
-	fmt.Println("pagingFromClient")
 
 	valid := verifyTokenForWS(&payload.Token, payload.Conn)
 	if valid == false {
@@ -176,7 +164,6 @@ func pagingFromClient(payload models.MediaPayload) {
 
 	medias, err := driver.DBMediaGetAll(&payload)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 
@@ -193,7 +180,6 @@ func pagingFromClient(payload models.MediaPayload) {
 //verifyTokenForWS handle token verification for ws conn which token sent via payload
 //will close conn if token invalid
 func verifyTokenForWS(token *string, ws *websocket.Conn) bool {
-	fmt.Println("verifyTokenForWS")
 	err := checkTokenStringErr(token)
 	if err != nil {
 		ws.Close()

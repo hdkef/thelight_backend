@@ -3,7 +3,6 @@ package controller
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"thelight/driver"
 	"thelight/models"
@@ -23,7 +22,6 @@ func NewArticleHandler(db *sql.DB) *ArticleHandler {
 //GetArticles give all articles filtered and paginated by ID
 func (x *ArticleHandler) GetArticles() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("GetArticles")
 
 		var payload models.ArticleFromClient
 
@@ -54,7 +52,6 @@ func (x *ArticleHandler) GetArticles() http.HandlerFunc {
 //GetArticle give one article. Probably because user view Article without going to landing-page first
 func (x *ArticleHandler) GetArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("GetArticle")
 
 		var payload models.ArticleFromClient
 
@@ -85,7 +82,6 @@ func (x *ArticleHandler) GetArticle() http.HandlerFunc {
 //SearchArticles give all articles filtered by something and paginated by ID
 func (x *ArticleHandler) SearchArticles() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("SearchArticles")
 
 		var payload models.ArticleFromClient
 

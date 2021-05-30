@@ -7,7 +7,7 @@ import (
 	"thelight/models"
 )
 
-//DBCommentGetAll
+//DBCommentGetAll will get all comments
 func DBCommentGetAll(db *sql.DB, payload *models.CommentFromClient) ([]models.Comment, error) {
 	ctx := context.Background()
 
@@ -38,7 +38,7 @@ func DBCommentGetAll(db *sql.DB, payload *models.CommentFromClient) ([]models.Co
 	return comments, nil
 }
 
-//DBCommentInsert
+//DBCommentInsert will store new comment in comment database
 func DBCommentInsert(db *sql.DB, payload *models.CommentFromClient) (int64, error) {
 	ctx := context.Background()
 
@@ -56,7 +56,7 @@ func DBCommentInsert(db *sql.DB, payload *models.CommentFromClient) (int64, erro
 	return insertedID, nil
 }
 
-//DBCommentDelete
+//DBCommentDelete will delete comment in comment database
 func DBCommentDelete(db *sql.DB, payload *models.CommentFromClient) error {
 	ctx := context.Background()
 

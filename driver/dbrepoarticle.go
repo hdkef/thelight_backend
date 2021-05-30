@@ -8,7 +8,7 @@ import (
 	"thelight/models"
 )
 
-//DBArticleGetAll
+//DBArticleGetAll will return all articles paginated by LastID
 func DBArticleGetAll(db *sql.DB, payload *models.ArticleFromClient) ([]models.Article, error) {
 	ctx := context.Background()
 
@@ -43,7 +43,7 @@ func DBArticleGetAll(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 	return articles, nil
 }
 
-//DBArticleGetOne
+//DBArticleGetOne return ID specified article
 func DBArticleGetOne(db *sql.DB, payload *models.ArticleFromClient) (models.Article, error) {
 	ctx := context.Background()
 
@@ -64,7 +64,7 @@ func DBArticleGetOne(db *sql.DB, payload *models.ArticleFromClient) (models.Arti
 	return article, nil
 }
 
-//DBArticleSearch
+//DBArticleSearch will get all articles paginated by LastID and filtered by tag and key
 func DBArticleSearch(db *sql.DB, payload *models.ArticleFromClient) ([]models.Article, error) {
 	ctx := context.Background()
 

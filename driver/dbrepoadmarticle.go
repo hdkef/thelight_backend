@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-//DBArticlePublish
+//DBArticlePublish will store newly created article to article database
 func DBArticlePublish(db *sql.DB, payload *models.ArticleFromClient, claims *models.WriterInfo) (int64, error) {
 	ctx := context.Background()
 
@@ -29,7 +29,7 @@ func DBArticlePublish(db *sql.DB, payload *models.ArticleFromClient, claims *mod
 	return insertedID, nil
 }
 
-//DBArticleSaveAs
+//DBArticleSaveAs will store article to draft database and send theI article ID
 func DBArticleSaveAs(db *sql.DB, payload *models.ArticleFromClient, claims *models.WriterInfo) (int64, error) {
 	ctx := context.Background()
 
@@ -69,7 +69,7 @@ func DBArticleEdit(db *sql.DB, payload *models.ArticleFromClient) (int64, error)
 	return insertedID, nil
 }
 
-//DBArticleDelete
+//DBArticleDelete will delete the article
 func DBArticleDelete(db *sql.DB, payload *models.ArticleFromClient) error {
 	ctx := context.Background()
 
@@ -81,7 +81,7 @@ func DBArticleDelete(db *sql.DB, payload *models.ArticleFromClient) error {
 	return nil
 }
 
-//DBArticleSave
+//DBArticleSave will update the article in draft article database
 func DBArticleSave(db *sql.DB, payload *models.ArticleFromClient, claims *models.WriterInfo) (int64, error) {
 	ctx := context.Background()
 
@@ -100,7 +100,7 @@ func DBArticleSave(db *sql.DB, payload *models.ArticleFromClient, claims *models
 	return insertedID, nil
 }
 
-//DBArticleDraftGetAll
+//DBArticleDraftGetAll will get all draft articles paginated by LastID
 func DBArticleDraftGetAll(db *sql.DB, payload *models.ArticleFromClient, claims *models.WriterInfo) ([]models.Article, error) {
 	ctx := context.Background()
 
@@ -131,7 +131,7 @@ func DBArticleDraftGetAll(db *sql.DB, payload *models.ArticleFromClient, claims 
 	return articles, nil
 }
 
-//DBArticleDraftGetOne
+//DBArticleDraftGetOne will return ID specified draft article
 func DBArticleDraftGetOne(db *sql.DB, payload *models.ArticleFromClient, claims *models.WriterInfo) (models.Article, error) {
 	ctx := context.Background()
 

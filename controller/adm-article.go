@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"thelight/driver"
 	"thelight/models"
@@ -12,7 +11,6 @@ import (
 //SaveArticleAs will save the article as a draft
 func (x *ArticleHandler) SaveArticleAs() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("SaveArticleAs")
 
 		Token := getTokenHeader(req)
 		claims, err := checkTokenStringClaims(&Token)
@@ -46,7 +44,6 @@ func (x *ArticleHandler) SaveArticleAs() http.HandlerFunc {
 //PublishArticle will publish article to public
 func (x *ArticleHandler) PublishArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("PublishArticle")
 
 		Token := getTokenHeader(req)
 		claims, err := checkTokenStringClaims(&Token)
@@ -76,7 +73,6 @@ func (x *ArticleHandler) PublishArticle() http.HandlerFunc {
 //DeleteArticle will destroy article from existence
 func (x *ArticleHandler) DeleteArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("DeleteArticle")
 
 		Token := getTokenHeader(req)
 		err := checkTokenStringErr(&Token)
@@ -106,7 +102,6 @@ func (x *ArticleHandler) DeleteArticle() http.HandlerFunc {
 //EditArticle will edit/update existed article
 func (x *ArticleHandler) EditArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("EditArticle")
 
 		Token := getTokenHeader(req)
 		err := checkTokenStringErr(&Token)
@@ -136,7 +131,6 @@ func (x *ArticleHandler) EditArticle() http.HandlerFunc {
 //SaveArticle will save the article in a draft
 func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("SaveArticle")
 
 		Token := getTokenHeader(req)
 		claims, err := checkTokenStringClaims(&Token)
@@ -163,10 +157,9 @@ func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
 	}
 }
 
-//GetDraftArticles
+//GetDraftArticles will return all articles paginated by LastID
 func (x *ArticleHandler) GetDraftAticles() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("GetDraftArticles")
 
 		Token := getTokenHeader(req)
 		claims, err := checkTokenStringClaims(&Token)
@@ -201,10 +194,9 @@ func (x *ArticleHandler) GetDraftAticles() http.HandlerFunc {
 	}
 }
 
-//GetDraftArticle
+//GetDraftArticle will get ID specified draft
 func (x *ArticleHandler) GetDraftArticle() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("GetDraftArticle")
 
 		Token := getTokenHeader(req)
 		claims, err := checkTokenStringClaims(&Token)

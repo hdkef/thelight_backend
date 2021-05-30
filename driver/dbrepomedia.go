@@ -4,15 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"thelight/models"
 )
 
-//DBMediaGetAll
+//DBMediaGetAll will return all media paginated by LastID
 func DBMediaGetAll(payload *models.MediaPayload) ([]models.Media, error) {
 	ctx := context.Background()
-
-	fmt.Println("page hit ", payload.Page, payload)
 
 	var limit int64 = 6
 
@@ -43,7 +40,7 @@ func DBMediaGetAll(payload *models.MediaPayload) ([]models.Media, error) {
 	return medias, nil
 }
 
-//DBMediaInsert
+//DBMediaInsert will insert media's ImageURL to media database
 func DBMediaInsert(db *sql.DB, imgurl string, claims *models.WriterInfo) (int64, error) {
 	ctx := context.Background()
 
@@ -61,7 +58,7 @@ func DBMediaInsert(db *sql.DB, imgurl string, claims *models.WriterInfo) (int64,
 	return insertedID, nil
 }
 
-//DBMediaDelete
+//DBMediaDelete will delete media imageURL in media database
 func DBMediaDelete(db *sql.DB, payload *models.MediaPayload) error {
 	ctx := context.Background()
 

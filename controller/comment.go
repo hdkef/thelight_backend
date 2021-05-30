@@ -3,7 +3,6 @@ package controller
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"thelight/driver"
 	"thelight/models"
@@ -23,7 +22,6 @@ func NewCommentHandler(db *sql.DB) *CommentHandler {
 //GetComments will get all comments
 func (x *CommentHandler) GetComments() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("GetComments")
 
 		var payload models.CommentFromClient
 
@@ -50,7 +48,6 @@ func (x *CommentHandler) GetComments() http.HandlerFunc {
 //InsertComment will insert one comment
 func (x *CommentHandler) InsertComment() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("InsertComment")
 
 		var payload models.CommentFromClient
 
@@ -74,7 +71,6 @@ func (x *CommentHandler) InsertComment() http.HandlerFunc {
 //DeleteComment will insert one comment
 func (x *CommentHandler) DeleteComment() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("DeleteComment")
 
 		Token := getTokenHeader(req)
 		err := checkTokenStringErr(&Token)

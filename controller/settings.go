@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"thelight/driver"
 	"thelight/models"
@@ -12,7 +11,6 @@ import (
 //Settings will handle settings from client
 func (x *AuthHandler) Settings() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("Settings")
 
 		var payload models.Settings
 

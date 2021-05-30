@@ -14,7 +14,6 @@ import (
 //MediaUpload is endpoint to handle image upload
 func (x *MediaHandler) MediaUpload() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("MediaUpload")
 
 		Token := getTokenHeader(req)
 		claims, err := checkTokenStringClaims(&Token)
@@ -58,7 +57,6 @@ func (x *MediaHandler) MediaUpload() http.HandlerFunc {
 
 //afterStoreImage will send websocket message so that client can update the image list
 func afterStoreImage(response *models.MediaPayload) {
-	fmt.Println("afterStoreImage")
 
 	ws := onlineMap[response.ID]
 
@@ -69,7 +67,6 @@ func afterStoreImage(response *models.MediaPayload) {
 
 //store image will store image and return image path / dir
 func storeImage(req *http.Request, formfilename string, foldername string) (string, error) {
-	fmt.Println("storeImage")
 
 	uploadedFile, handler, err := req.FormFile(formfilename)
 	if err != nil {
@@ -79,7 +76,6 @@ func storeImage(req *http.Request, formfilename string, foldername string) (stri
 
 	workingdir, err := os.Getwd()
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 
@@ -89,19 +85,16 @@ func storeImage(req *http.Request, formfilename string, foldername string) (stri
 
 	err = createNewFolderIfNotExist(folderpath)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 
 	targetFile, err := os.OpenFile(fileloc, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 	defer targetFile.Close()
 
 	if _, err := io.Copy(targetFile, uploadedFile); err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 
@@ -111,7 +104,6 @@ func storeImage(req *http.Request, formfilename string, foldername string) (stri
 
 //createNewFolderIfNotExist will check folder directory and create new folder if not exist
 func createNewFolderIfNotExist(path string) error {
-	fmt.Println("createNewFolderIfNotExist")
 
 	_, err := os.Stat(path)
 	if os.IsNotExist(err) {

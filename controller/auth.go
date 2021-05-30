@@ -35,20 +35,17 @@ func NewAuthHandler(db *sql.DB) *AuthHandler {
 //Register will handle user registration which first assign avatarURL and Bio
 func (x *AuthHandler) Register() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("Register")
 
 		var payload models.AuthFromClient
 
 		err := json.NewDecoder(req.Body).Decode(&payload)
 		if err != nil {
-			fmt.Println(err)
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
 		}
 
 		hashPassByte, err := bcrypt.GenerateFromPassword([]byte(payload.Pass), 10)
 		if err != nil {
-			fmt.Println(err)
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
 		}
@@ -57,7 +54,6 @@ func (x *AuthHandler) Register() http.HandlerFunc {
 
 		_, err = driver.DBAuthRegister(x.db, &payload)
 		if err != nil {
-			fmt.Println(err)
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
 		}
@@ -69,7 +65,6 @@ func (x *AuthHandler) Register() http.HandlerFunc {
 //Login will give jwt and claims to authenticated user
 func (x *AuthHandler) Login() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("Login")
 
 		var payload models.AuthFromClient
 
@@ -97,7 +92,6 @@ func (x *AuthHandler) Login() http.HandlerFunc {
 			return
 		}
 
-		//TOBE REPLACED WITH REAL WRITERINFO FROM DB
 		response := models.AuthFromServer{
 			WriterInfo: models.WriterInfo{
 				ID:        user.ID,
@@ -121,7 +115,6 @@ func (x *AuthHandler) Login() http.HandlerFunc {
 //jwt valid and jwt's expiredAt not within time range.
 func (x *AuthHandler) AutoLogin() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println("AutoLogin")
 
 		Token := getTokenHeader(*&req)
 
@@ -168,7 +161,6 @@ func sendNewToken(res *http.ResponseWriter, claims *models.WriterInfo) {
 
 //newClaimsMap create new jwt mapclaims from user struct and return it
 func newClaimsMap(user *models.WriterInfo) jwt.MapClaims {
-	fmt.Println("newClaimsMap")
 	var claims jwt.MapClaims = make(jwt.MapClaims)
 
 	var userval = reflect.ValueOf(*user)
@@ -177,7 +169,6 @@ func newClaimsMap(user *models.WriterInfo) jwt.MapClaims {
 	for i := 0; i < userval.NumField(); i++ {
 		fieldName := usertype.Field(i).Name
 		fieldValue := userval.Field(i).Interface()
-		fmt.Println(fieldValue)
 		if userval.Field(i).Kind() == reflect.Int64 {
 			claims[fieldName] = fieldValue.(int64)
 		} else {
@@ -193,7 +184,6 @@ func newClaimsMap(user *models.WriterInfo) jwt.MapClaims {
 
 //createToken return new token string
 func createToken(user *models.WriterInfo) (string, error) {
-	fmt.Println("createToken")
 
 	secret := os.Getenv("SECRET")
 
@@ -216,7 +206,6 @@ func getTokenHeader(req *http.Request) string {
 
 //handleTokenErrClearBearer set header ClearBearer when authentication fail and send response error
 func handleTokenErrClearBearer(res *http.ResponseWriter, err *error) {
-	fmt.Println("handleTokenErrClearBearer")
 	(*res).Header().Set("Clearbearer", "OK")
 	(*res).Header().Set("Access-Control-Expose-Headers", "Clearbearer")
 	utils.ResErr(res, http.StatusUnauthorized, *err)
@@ -225,7 +214,6 @@ func handleTokenErrClearBearer(res *http.ResponseWriter, err *error) {
 //checkTokenStringClaims will validate token and return claims (NOT map claims) and error
 //TOBE IMPLEMENTED IF EXP BETWEEN RANGE RETURN ERR "NEED NEW TOKEN"
 func checkTokenStringClaims(token *string) (models.WriterInfo, error) {
-	fmt.Println("checkTokenStringClaims")
 
 	if *token == "" {
 		return models.WriterInfo{}, errors.New("NO TOKEN")
@@ -234,7 +222,6 @@ func checkTokenStringClaims(token *string) (models.WriterInfo, error) {
 	parsedToken, err := parseTokenString(token)
 
 	if err != nil {
-		fmt.Println(err)
 		return models.WriterInfo{}, err
 	}
 	if parsedToken.Valid == false {
@@ -243,8 +230,8 @@ func checkTokenStringClaims(token *string) (models.WriterInfo, error) {
 
 	var mapClaims jwt.MapClaims = parsedToken.Claims.(jwt.MapClaims)
 
-	//here is a fucking weird, WHY I NEED TO CAST ID TO FLOAT64??
-	//I USE REFLECT TO CREATE JWT MAPS WHICH MEANS ID SUPPOSED TO BE UINT
+	//here is weird, WHY I NEED TO CAST ID TO FLOAT64??
+	//I USE REFLECT TO CREATE JWT MAPS WHICH MEANS ID SUPPOSED TO BE Int64?
 
 	claims := models.WriterInfo{
 		ID:        int64(mapClaims["ID"].(float64)),
@@ -257,7 +244,6 @@ func checkTokenStringClaims(token *string) (models.WriterInfo, error) {
 
 //checkTokenStringErr will validate token and return error // being used in endpoints that doesn't need claims
 func checkTokenStringErr(token *string) error {
-	fmt.Println("checkTokenStringErr")
 
 	if *token == "" {
 		return errors.New("NO TOKEN")
@@ -266,7 +252,6 @@ func checkTokenStringErr(token *string) error {
 	parsedToken, err := parseTokenString(token)
 
 	if err != nil && err.Error() != "NEED NEW TOKEN" {
-		fmt.Println(err)
 		return err
 	}
 	if parsedToken.Valid == false {
@@ -277,7 +262,6 @@ func checkTokenStringErr(token *string) error {
 
 //parseTokenString will parse token string and return jwt.Token & error
 func parseTokenString(token *string) (*jwt.Token, error) {
-	fmt.Println("parseTokenString")
 	parsedToken, err := jwt.Parse(*token, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("there was an error")
@@ -298,7 +282,6 @@ func parseTokenString(token *string) (*jwt.Token, error) {
 
 //checkTokenRenew will return true if token expiration time between range that need to be renewed
 func checkTokenRenew(token *jwt.Token) bool {
-	fmt.Println("checkTokenRenew")
 
 	now := time.Now().Unix()
 	timeSubNow := (*token).Claims.(jwt.MapClaims)["exp"].(float64) - float64(now)
