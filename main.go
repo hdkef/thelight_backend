@@ -43,8 +43,9 @@ func main() {
 	router.HandleFunc("/article/delete", utils.Cors(article.DeleteArticle()))
 	router.HandleFunc("/article/edit", utils.Cors(article.EditArticle()))
 
-	router.HandleFunc("/draft/getall", utils.Cors(article.GetDraftAticles()))
+	router.HandleFunc("/draft/getall", utils.Cors(article.GetDraftArticles()))
 	router.HandleFunc("/draft/getone", utils.Cors(article.GetDraftArticle()))
+	router.HandleFunc("/draft/delete", utils.Cors(article.DeleteDraft()))
 
 	router.HandleFunc("/comment/getall", utils.Cors(comment.GetComments()))
 	router.HandleFunc("/comment/insert", utils.Cors(comment.InsertComment()))

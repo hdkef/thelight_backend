@@ -19,8 +19,8 @@ func DBArticlePublish(db *sql.DB, payload *models.ArticleFromClient, claims *mod
 
 	err := db.QueryRowContext(
 		ctx,
-		"INSERT INTO articles (Title, Date, Body, Tag, ImageURL, User_Ref) VALUES ($1,$2,$3,$4,$5,$6) RETURNING ID",
-		payload.ArticleFromClient.Title, date, payload.ArticleFromClient.Body, tag, payload.ArticleFromClient.ImageURL, claims.ID,
+		"INSERT INTO articles (Title, Date, Body, Tag, ImageURL, User_Ref, Preview) VALUES ($1,$2,$3,$4,$5,$6, $7) RETURNING ID",
+		payload.ArticleFromClient.Title, date, payload.ArticleFromClient.Body, tag, payload.ArticleFromClient.ImageURL, claims.ID, payload.ArticleFromClient.Preview,
 	).Scan(&insertedID)
 	if err != nil {
 		return 0, err
@@ -40,8 +40,8 @@ func DBArticleSaveAs(db *sql.DB, payload *models.ArticleFromClient, claims *mode
 
 	err := db.QueryRowContext(
 		ctx,
-		"INSERT INTO drafts (Title, Date, Body, Tag, ImageURL, User_Ref) VALUES ($1,$2,$3,$4,$5,$6) RETURNING ID",
-		payload.ArticleFromClient.Title, date, payload.ArticleFromClient.Body, tag, payload.ArticleFromClient.ImageURL, claims.ID,
+		"INSERT INTO drafts (Title, Date, Body, Tag, ImageURL, User_Ref, Preview) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING ID",
+		payload.ArticleFromClient.Title, date, payload.ArticleFromClient.Body, tag, payload.ArticleFromClient.ImageURL, claims.ID, payload.ArticleFromClient.Preview,
 	).Scan(&insertedID)
 	if err != nil {
 		return 0, err
@@ -59,8 +59,8 @@ func DBArticleEdit(db *sql.DB, payload *models.ArticleFromClient) (int64, error)
 
 	err := db.QueryRowContext(
 		ctx,
-		"UPDATE articles SET Title=$1,Body=$2,Tag=$3,ImageURL=$4 WHERE ID=$5 RETURNING ID",
-		payload.ArticleFromClient.Title, payload.ArticleFromClient.Body, tag, payload.ArticleFromClient.ImageURL, payload.ArticleFromClient.ID,
+		"UPDATE articles SET Title=$1,Body=$2,Tag=$3,ImageURL=$4,Preview=$5 WHERE ID=$6 RETURNING ID",
+		payload.ArticleFromClient.Title, payload.ArticleFromClient.Body, tag, payload.ArticleFromClient.ImageURL, payload.ArticleFromClient.Preview, payload.ArticleFromClient.ID,
 	).Scan(&insertedID)
 	if err != nil {
 		return 0, err
@@ -90,8 +90,8 @@ func DBArticleSave(db *sql.DB, payload *models.ArticleFromClient, claims *models
 
 	err := db.QueryRowContext(
 		ctx,
-		"UPDATE drafts SET Title=$1,Body=$2,Tag=$3,ImageURL=$4 WHERE ID=$5 AND USER_REF=$6 RETURNING ID",
-		payload.ArticleFromClient.Title, payload.ArticleFromClient.Body, tag, payload.ArticleFromClient.ImageURL, payload.ArticleFromClient.ID, claims.ID,
+		"UPDATE drafts SET Title=$1,Body=$2,Tag=$3,ImageURL=$4,Preview=$5 WHERE ID=$6 AND USER_REF=$7 RETURNING ID",
+		payload.ArticleFromClient.Title, payload.ArticleFromClient.Body, tag, payload.ArticleFromClient.ImageURL, payload.ArticleFromClient.Preview, payload.ArticleFromClient.ID, claims.ID,
 	).Scan(&insertedID)
 	if err != nil {
 		return 0, err
@@ -110,7 +110,7 @@ func DBArticleDraftGetAll(db *sql.DB, payload *models.ArticleFromClient, claims 
 
 	rows, err := db.QueryContext(
 		ctx,
-		"SELECT ID, Title, Date, Body, Tag, ImageURL FROM drafts WHERE USER_REF=$1 AND ID > $2 LIMIT $3",
+		"SELECT ID, Title, Date, Body, Tag, ImageURL, Preview FROM drafts WHERE USER_REF=$1 AND ID > $2 LIMIT $3",
 		claims.ID, payload.LastID, limit,
 	)
 	if err != nil {
@@ -120,7 +120,7 @@ func DBArticleDraftGetAll(db *sql.DB, payload *models.ArticleFromClient, claims 
 	for rows.Next() {
 		var tmp models.Article
 		var tagstring string
-		err = rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL)
+		err = rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL, &tmp.Preview)
 		if err != nil {
 			return nil, err
 		}
@@ -140,9 +140,9 @@ func DBArticleDraftGetOne(db *sql.DB, payload *models.ArticleFromClient, claims 
 
 	err := db.QueryRowContext(
 		ctx,
-		"SELECT ID, Title, Date, Body, Tag, ImageURL FROM drafts WHERE ID=$1 AND USER_REF=$2",
+		"SELECT ID, Title, Date, Body, Tag, ImageURL, Preview FROM drafts WHERE ID=$1 AND USER_REF=$2",
 		payload.ID, claims.ID,
-	).Scan(&article.ID, &article.Title, &article.Date, &article.Body, &tagstring, &article.ImageURL)
+	).Scan(&article.ID, &article.Title, &article.Date, &article.Body, &tagstring, &article.ImageURL, &article.Preview)
 	if err != nil {
 		return article, err
 	}
@@ -150,4 +150,16 @@ func DBArticleDraftGetOne(db *sql.DB, payload *models.ArticleFromClient, claims 
 	article.Tag = strings.Split(tagstring, ",")
 
 	return article, nil
+}
+
+//DBArticleDraftDelete will delete the draft
+func DBArticleDraftDelete(db *sql.DB, payload *models.ArticleFromClient) error {
+	ctx := context.Background()
+
+	_, err := db.ExecContext(ctx, "DELETE FROM drafts WHERE id=$1", payload.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

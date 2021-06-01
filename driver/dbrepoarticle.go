@@ -18,7 +18,7 @@ func DBArticleGetAll(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 
 	rows, err := db.QueryContext(
 		ctx,
-		"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles FULL JOIN users ON users.ID = articles.User_Ref WHERE articles.ID > $1 ORDER BY articles.ID ASC LIMIT $2",
+		"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, articles.Preview, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles FULL JOIN users ON users.ID = articles.User_Ref WHERE articles.ID > $1 ORDER BY articles.ID ASC LIMIT $2",
 		payload.LastID, limit,
 	)
 	if err != nil {
@@ -28,7 +28,7 @@ func DBArticleGetAll(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 	for rows.Next() {
 		var tmp models.Article
 		var tagstring string
-		err = rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL, &tmp.WriterInfo.ID, &tmp.WriterInfo.Name, &tmp.WriterInfo.AvatarURL, &tmp.WriterInfo.Bio)
+		err = rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL, &tmp.Preview, &tmp.WriterInfo.ID, &tmp.WriterInfo.Name, &tmp.WriterInfo.AvatarURL, &tmp.WriterInfo.Bio)
 		if err != nil {
 			return nil, err
 		}
@@ -52,9 +52,9 @@ func DBArticleGetOne(db *sql.DB, payload *models.ArticleFromClient) (models.Arti
 
 	err := db.QueryRowContext(
 		ctx,
-		"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles JOIN users ON users.ID = articles.User_Ref WHERE articles.ID=$1",
+		"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, articles.Preview, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles JOIN users ON users.ID = articles.User_Ref WHERE articles.ID=$1",
 		payload.ID,
-	).Scan(&article.ID, &article.Title, &article.Date, &article.Body, &tagstring, &article.ImageURL, &article.WriterInfo.ID, &article.WriterInfo.Name, &article.WriterInfo.AvatarURL, &article.WriterInfo.Bio)
+	).Scan(&article.ID, &article.Title, &article.Date, &article.Body, &tagstring, &article.ImageURL, &article.Preview, &article.WriterInfo.ID, &article.WriterInfo.Name, &article.WriterInfo.AvatarURL, &article.WriterInfo.Bio)
 	if err != nil {
 		return article, err
 	}
@@ -80,13 +80,13 @@ func DBArticleSearch(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 	if payload.Filter == "Tag" {
 		rows, err = db.QueryContext(
 			ctx,
-			"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles JOIN users ON users.ID = articles.User_Ref WHERE articles.Tag LIKE '%' || $1 || '%' AND articles.ID > $2 ORDER BY articles.ID ASC LIMIT $3",
+			"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, articles.Preview ,users.ID, users.Name, users.AvatarURL, users.Bio FROM articles JOIN users ON users.ID = articles.User_Ref WHERE articles.Tag LIKE '%' || $1 || '%' AND articles.ID > $2 ORDER BY articles.ID ASC LIMIT $3",
 			payload.Key, payload.LastID, limit,
 		)
 	} else if payload.Filter == "Title" {
 		rows, err = db.QueryContext(
 			ctx,
-			"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles JOIN users ON users.ID = articles.User_Ref WHERE articles.Title LIKE '%' || $1 || '%' AND articles.ID > $2 ORDER BY articles.ID ASC LIMIT $3",
+			"SELECT articles.ID, articles.Title, articles.Date, articles.Body, articles.Tag, articles.ImageURL, articles.Preview, users.ID, users.Name, users.AvatarURL, users.Bio FROM articles JOIN users ON users.ID = articles.User_Ref WHERE articles.Title LIKE '%' || $1 || '%' AND articles.ID > $2 ORDER BY articles.ID ASC LIMIT $3",
 			payload.Key, payload.LastID, limit,
 		)
 	} else {
@@ -100,7 +100,7 @@ func DBArticleSearch(db *sql.DB, payload *models.ArticleFromClient) ([]models.Ar
 	for rows.Next() {
 		var tmp models.Article
 		var tagstring string
-		err = rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL, &tmp.WriterInfo.ID, &tmp.WriterInfo.Name, &tmp.WriterInfo.AvatarURL, &tmp.WriterInfo.Bio)
+		err = rows.Scan(&tmp.ID, &tmp.Title, &tmp.Date, &tmp.Body, &tagstring, &tmp.ImageURL, &tmp.Preview, &tmp.WriterInfo.ID, &tmp.WriterInfo.Name, &tmp.WriterInfo.AvatarURL, &tmp.WriterInfo.Bio)
 		if err != nil {
 			return nil, err
 		}

@@ -158,7 +158,7 @@ func (x *ArticleHandler) SaveArticle() http.HandlerFunc {
 }
 
 //GetDraftArticles will return all articles paginated by LastID
-func (x *ArticleHandler) GetDraftAticles() http.HandlerFunc {
+func (x *ArticleHandler) GetDraftArticles() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 
 		Token := getTokenHeader(req)
@@ -228,5 +228,34 @@ func (x *ArticleHandler) GetDraftArticle() http.HandlerFunc {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
 		}
+	}
+}
+
+//DeleteDraft will destroy draft from existence
+func (x *ArticleHandler) DeleteDraft() http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+
+		Token := getTokenHeader(req)
+		err := checkTokenStringErr(&Token)
+		if err != nil {
+			handleTokenErrClearBearer(&res, &err)
+			return
+		}
+
+		var payload models.ArticleFromClient
+
+		err = json.NewDecoder(req.Body).Decode(&payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		err = driver.DBArticleDraftDelete(x.db, &payload)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		utils.ResOK(&res, "OK")
 	}
 }
