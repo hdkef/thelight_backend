@@ -59,13 +59,30 @@ func DBMediaInsert(db *sql.DB, imgurl string, claims *models.WriterInfo) (int64,
 }
 
 //DBMediaDelete will delete media imageURL in media database
-func DBMediaDelete(db *sql.DB, payload *models.MediaPayload) error {
+func DBMediaDelete(db *sql.DB, payload *models.MediaPayload, claims *models.WriterInfo) error {
 	ctx := context.Background()
 
-	_, err := db.ExecContext(ctx, "DELETE FROM medias WHERE id=$1", payload.ID)
+	_, err := db.ExecContext(ctx, "DELETE FROM MEDIAS WHERE MEDIAS.ID=$1 AND USER_REF=$2", payload.ID, claims.ID)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+//DBMediaGetImageURL get imagedir of an image from media database
+func DBMediaGetImageURL(db *sql.DB, payload *models.MediaPayload, claims *models.WriterInfo) (string, error) {
+	ctx := context.Background()
+
+	var imagedir string
+
+	err := db.QueryRowContext(
+		ctx,
+		"SELECT medias.IMAGEURL FROM medias WHERE medias.ID=$1 AND USER_REF=$2",
+		payload.ID, claims.ID,
+	).Scan(&imagedir)
+	if err != nil {
+		return "", nil
+	}
+	return imagedir, nil
 }
