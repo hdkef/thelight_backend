@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	NEWUSR_AVATARURL = "https://fonts.gstatic.com/s/i/materialiconsoutlined/perm_identity/v11/24px.svg"
+	NEWUSR_AVATARURL = "https://pbs.twimg.com/profile_images/1363210545118150659/Uo-XiGtv_400x400.jpg"
 	NEWUSR_BIO       = "Hi! i am a writer"
 )
 
