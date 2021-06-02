@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	NEWUSR_AVATARURL = "https://pbs.twimg.com/profile_images/1363210545118150659/Uo-XiGtv_400x400.jpg"
+	NEWUSR_AVATARURL = "https://fonts.gstatic.com/s/i/materialiconsoutlined/perm_identity/v11/24px.svg"
 	NEWUSR_BIO       = "Hi! i am a writer"
 )
 
@@ -19,8 +19,8 @@ func DBAuthRegister(db *sql.DB, payload *models.AuthFromClient) (int64, error) {
 
 	err := db.QueryRowContext(
 		ctx,
-		"INSERT INTO users (Name,Pass,AvatarURL,Bio) VALUES ($1,$2,$3,$4) RETURNING ID",
-		payload.Name, payload.Pass, NEWUSR_AVATARURL, NEWUSR_BIO,
+		"INSERT INTO users (Name,Pass,AvatarURL,Bio, Email) VALUES ($1,$2,$3,$4,$5) RETURNING ID",
+		payload.Name, payload.Pass, NEWUSR_AVATARURL, NEWUSR_BIO, payload.Email,
 	).Scan(&insertedID)
 
 	if err != nil {

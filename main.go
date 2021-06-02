@@ -32,7 +32,8 @@ func main() {
 	router.HandleFunc("/auth/login", utils.Cors(auth.Login()))
 	router.HandleFunc("/auth/autologin", utils.Cors(auth.AutoLogin()))
 	router.HandleFunc("/auth/settings", utils.Cors(auth.Settings()))
-	router.HandleFunc("/auth/reg", utils.Cors(auth.Register()))
+	router.HandleFunc("/auth/register", utils.Cors(auth.Register()))
+	router.HandleFunc("/auth/emailver", utils.Cors(auth.HandleEmailVerReq()))
 
 	router.HandleFunc("/article/getall", utils.Cors(article.GetArticles()))
 	router.HandleFunc("/article/getone", utils.Cors(article.GetArticle()))

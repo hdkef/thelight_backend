@@ -44,15 +44,26 @@ func (x *AuthHandler) Register() http.HandlerFunc {
 			return
 		}
 
-		hashPassByte, err := bcrypt.GenerateFromPassword([]byte(payload.Pass), 10)
+		newusers, err := driver.SelectUsersReg(x.db, payload.Email)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return
 		}
 
-		payload.Pass = string(hashPassByte)
+		if newusers.Code != payload.Code {
+			utils.ResErr(&res, http.StatusInternalServerError, errors.New("CODE IS NOT MATCH"))
+			return
+		}
 
-		_, err = driver.DBAuthRegister(x.db, &payload)
+		hashPassByte, err := bcrypt.GenerateFromPassword([]byte(newusers.Pass), 10)
+		if err != nil {
+			utils.ResErr(&res, http.StatusInternalServerError, err)
+			return
+		}
+
+		newusers.Pass = string(hashPassByte)
+
+		_, err = driver.DBAuthRegister(x.db, &newusers)
 		if err != nil {
 			utils.ResErr(&res, http.StatusInternalServerError, err)
 			return

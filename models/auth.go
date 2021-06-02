@@ -5,6 +5,8 @@ type AuthFromClient struct {
 	ID    int64
 	Name  string
 	Pass  string
+	Email string
+	Code  string
 	Token string
 }
 
