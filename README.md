@@ -11,3 +11,6 @@ for example, article hit counter, geography tracking, user agent tracking, etc
 2. Server side rendering
 because this is a blogging medium, this web app needs to be exposed to search engine. But,
 server side rendering for angular is using node.js and not golang, i'll find a way to make it possible to work with golang. Maybe, i make two separated entities, nodejs for handling the static things (like serving images, html, css, js) and golang for handling data processing.
+
+3. Hashmap data structure
+use hashmap instead of array for frontend article cache so that when user want to view specific article it can be done with O(1) complexity
